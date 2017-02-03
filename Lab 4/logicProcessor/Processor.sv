@@ -5,21 +5,21 @@
 
 //Always use input/output logic types when possible, prevents issues with tools that have strict type enforcement
 
-module Processor (input logic   Clk,     // Internal
-                                Reset,   // Push button 0
-                                LoadA,   // Push button 1
-                                LoadB,   // Push button 2
-                                Execute, // Push button 3
-                  input  logic [3:0]  Din,     // input data
-                  input  logic [2:0]  F,       // Function select
-                  input  logic [1:0]  R,       // Routing select
-                  output logic [3:0]  LED,     // DEBUG
-                  output logic [3:0]  Aval,    // DEBUG
-                                Bval,    // DEBUG
-                  output logic [6:0]  AhexL,
-                                AhexU,
-                                BhexL,
-                                BhexU);
+module logicProcessor (input logic   Clk,     // Internal
+                                     Reset,   // Push button 0
+                                     LoadA,   // Push button 1
+                                     LoadB,   // Push button 2
+                                     Execute, // Push button 3
+                 input  logic [3:0]  Din,     // input data
+                 input  logic [2:0]  F,       // Function select
+                 input  logic [1:0]  R,       // Routing select
+                 output logic [3:0]  LED,     // DEBUG
+                 output logic [3:0]  Aval,    // DEBUG
+                                     Bval,    // DEBUG
+                 output logic [6:0]  AhexL,
+                                     AhexU,
+                                     BhexL,
+                                     BhexU);
 
 	 //local logic variables go here
 	 logic Reset_SH, LoadA_SH, LoadB_SH, Execute_SH;

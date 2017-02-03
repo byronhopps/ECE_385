@@ -28,7 +28,7 @@ integer ErrorCnt = 0;
 		
 // Instantiating the DUT
 // Make sure the module and signal names match with those in your design
-Processor processor0(.*);	
+logicProcessor processor0(.*);	
 
 // Toggle the clock
 // #1 means wait for a delay of 1 timeunit
