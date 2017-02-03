@@ -67,9 +67,13 @@ set_global_assignment -name SYSTEMVERILOG_FILE Control.sv
 set_global_assignment -name SYSTEMVERILOG_FILE compute.sv
 set_global_assignment -name EDA_TEST_BENCH_NAME testBench_4 -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id testBench_4
-set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testBench -section_id testBench_4
-set_global_assignment -name EDA_TEST_BENCH_FILE testbench.sv -section_id testBench_4
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testBench_4 -section_id testBench_4
 set_global_assignment -name EDA_TEST_BENCH_NAME testbench_8 -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id testbench_8
-set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench -section_id testbench_8
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench_8 -section_id testbench_8
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_FILE testbench.sv -section_id testBench_4
 set_global_assignment -name EDA_TEST_BENCH_FILE testbench_8.sv -section_id testbench_8
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
