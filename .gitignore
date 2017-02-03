@@ -1,3 +1,15 @@
+# Miscellaneous data files
+*.bak
+*.rpt
+*.qdf
+*.qws
+
+# Ignore compilation and simulation directories
+incremental_db/
+output_files/
+simulation/
+db/
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
