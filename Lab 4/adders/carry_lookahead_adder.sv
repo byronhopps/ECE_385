@@ -28,6 +28,13 @@ module carry_lookahead_4bit
     logic[3:0] G;
     logic[3:0] C;
 
+    // Determine carry inputs to adders
+    assign C[0] = CI;
+    assign C[1] = G[0] | (P[0] & C[0]);
+    assign C[2] = G[1] | (G[0] & P[1]) | (C[0] & P[0] & P[1]);
+    assign C[3] = G[2] | (G[1] & P[2]) | (G[0] & P[1] & P[2]) | (C[0] & P[0] & P[1] & P[2]);
+    assign C[4] = G[3] | (G[2] & P[3]) | (G[1] & P[2] & P[3]) | (G[0] & P[1] & P[2] & P[3]) | (C[0] & P[0] & P[1] & P[2] & P[3]);
+
     // Attach bits to adders
     lookaheadAdder adder0 (.A(A[0], .B(B[0]), .C(C[0]), .S(S[0]), .P(P[0]), .G(G[0])))
     lookaheadAdder adder1 (.A(A[1], .B(B[1]), .C(C[1]), .S(S[1]), .P(P[1]), .G(G[1])))
