@@ -10,8 +10,10 @@ module ripple_adder
      *
      * Insert code here to implement a ripple adder.
      * Your code should be completly combinational (don't use always_ff or always_latch).
-     * Feel free to create sub-modules or other files. */
+     * Feel free to create sub-modules or other files.
+     */
 
+    a
 
 endmodule
 
