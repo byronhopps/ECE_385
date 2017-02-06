@@ -50,3 +50,10 @@ set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
 set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
+set_global_assignment -name SYSTEMVERILOG_FILE ripple_adder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE lab4_adders_toplevel.sv
+set_global_assignment -name SYSTEMVERILOG_FILE HexDriver.sv
+set_global_assignment -name SYSTEMVERILOG_FILE carry_select_adder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE carry_lookahead_adder.sv
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
