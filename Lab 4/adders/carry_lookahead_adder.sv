@@ -34,6 +34,7 @@ module carry_lookahead_4bit
     assign C[2] = G[1] | (G[0] & P[1]) | (C[0] & P[0] & P[1]);
     assign C[3] = G[2] | (G[1] & P[2]) | (G[0] & P[1] & P[2]) | (C[0] & P[0] & P[1] & P[2]);
     assign C[4] = G[3] | (G[2] & P[3]) | (G[1] & P[2] & P[3]) | (G[0] & P[1] & P[2] & P[3]) | (C[0] & P[0] & P[1] & P[2] & P[3]);
+    assign CO = C[4];
 
     // Attach bits to adders
     lookaheadAdder adder0 (.A(A[0], .B(B[0]), .C(C[0]), .S(S[0]), .P(P[0]), .G(G[0])))
