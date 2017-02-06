@@ -31,4 +31,7 @@ module fullAdder
     output  logic   s,co
 );
 
+    assign s = a ^ b ^ ci;
+    assign co = (a & b) | (b & ci) | (ci & a);
+
 endmodule
