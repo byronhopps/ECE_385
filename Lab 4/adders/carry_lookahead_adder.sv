@@ -11,5 +11,17 @@ module carry_lookahead_adder
      * Insert code here to implement a CLA adder.
      * Your code should be completly combinational (don't use always_ff or always_latch).
      * Feel free to create sub-modules or other files. */
-     
+
+endmodule
+
+module lookaheadAdder
+(
+    input   A, B, C,
+    output  S, P, G
+    );
+
+    assign S = A ^ B ^ C;
+    assign P = A ^ B;
+    assign G = A & B;
+
 endmodule
