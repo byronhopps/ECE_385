@@ -12,12 +12,13 @@ module ripple_adder
      * Your code should be completly combinational (don't use always_ff or always_latch).
      * Feel free to create sub-modules or other files. */
 
-     
+
 endmodule
 
 module fullAdder (input a, b, cin,
                   output s, cout);
-						
-	assign s = a^b^cin;
-	assign cout = (a&b)|(b&cin)|(cin&a);
+
+    assign s = a^b^cin;
+    assign cout = (a&b)|(b&cin)|(cin&a);
 endmodule
+
