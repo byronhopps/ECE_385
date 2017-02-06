@@ -5,12 +5,15 @@ module carry_lookahead_adder
     output  logic[15:0]     Sum,
     output  logic           CO
 );
+    // Define carry signals
+    logic C[3:0];
+    assign C[0] = 0;
 
-    /* TODO
-     *
-     * Insert code here to implement a CLA adder.
-     * Your code should be completly combinational (don't use always_ff or always_latch).
-     * Feel free to create sub-modules or other files. */
+    // Cascade 4 4-bit carry-lookahead adders
+    carry_lookahead_4bit adderBlock0 (.A(A[3:0]), .B(B[3:0]), .S(Sum[3:0]), .CI(C[0]), .CO(C[1]));
+    carry_lookahead_4bit adderBlock1 (.A(A[7:4]), .B(B[7:4]), .S(Sum[7:4]), .CI(C[1]), .CO(C[2]));
+    carry_lookahead_4bit adderBlock2 (.A(A[11:8]), .B(B[11:8]), .S(Sum[11:8]), .CI(C[2]), .CO(C[3]));
+    carry_lookahead_4bit adderBlock3 (.A(A[15:12]), .B(B[15:12]), .S(Sum[15:12]), .CI(C[3]), .CO);
 
 endmodule
 
