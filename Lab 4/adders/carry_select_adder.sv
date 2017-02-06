@@ -13,3 +13,22 @@ module carry_select_adder
      * Feel free to create sub-modules or other files. */
      
 endmodule
+
+module carrySelect_4bit
+(
+    input   logic[3:0]      A,
+    input   logic[3:0]      B,
+    output  logic[3:0]      S,
+    input   logic           CI,
+    output  logic           CO
+);
+
+endmodule
+
+module fullAdder
+(
+    input   logic   a,b,ci,
+    output  logic   s,co
+);
+
+endmodule
