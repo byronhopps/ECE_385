@@ -27,11 +27,10 @@ endmodule
 
 module mux_2in
 (
-    input   logic[1:0]      a,
-    input   logic           s,
-    output  logic           out
+    input   logic a1, b0, s,
+    output  logic out
 );
 
-    assign out = (a[1] & s) | (A[0] & ~s);
+    assign out = (a1 & s) | (b0 & ~s);
 
 endmodule
