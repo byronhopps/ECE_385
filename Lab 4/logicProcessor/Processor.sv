@@ -5,7 +5,7 @@
 
 //Always use input/output logic types when possible, prevents issues with tools that have strict type enforcement
 
-module Processor (input logic   Clk,     // Internal
+module logicProcessor (input logic   Clk,     // Internal
                                 Reset,   // Push button 0
                                 LoadA,   // Push button 1
                                 LoadB,   // Push button 2
