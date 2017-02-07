@@ -29,7 +29,7 @@ module carry_lookahead_4bit
     // Define internal propagation, generation, and carry bits
     logic[3:0] P;
     logic[3:0] G;
-    logic[3:0] C;
+    logic[4:0] C;
 
     // Determine carry inputs to adders
     assign C[0] = CI;
