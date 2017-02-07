@@ -32,6 +32,6 @@ module mux_2in
     output  logic           out
 );
 
-//    assign out = (a[1] & s) | 
+    assign out = (a[1] & s) | (A[0] & ~s);
 
 endmodule
