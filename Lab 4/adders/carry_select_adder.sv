@@ -6,12 +6,16 @@ module carry_select_adder
     output  logic           CO
 );
 
-    /* TODO
-     *
-     * Insert code here to implement a carry select.
-     * Your code should be completly combinational (don't use always_ff or always_latch).
-     * Feel free to create sub-modules or other files. */
-     
+    // Define carry signals
+    logic[3:0] c;
+    assign CO = c[3];
+
+    // Define adder modules
+    carrySelect_4bit adder0 (.A(A[3:0]), .B(B[3:0]), .S(Sum[3:0]), .CI(0), .CO(c[0]));
+    carrySelect_4bit adder1 (.A(A[7:4]), .B(B[7:4]), .S(Sum[7:4]), .CI(c[0]), .CO(c[1]));
+    carrySelect_4bit adder2 (.A(A[11:8]), .B(B[11:8]), .S(Sum[11:8]), .CI(c[1]), .CO(c[2]));
+    carrySelect_4bit adder3 (.A(A[15:12]), .B(B[15:12]), .S(Sum[15:12]), .CI(c[2]), .CO(c[3]));
+
 endmodule
 
 module carrySelect_4bit
