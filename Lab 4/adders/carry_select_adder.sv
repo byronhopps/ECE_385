@@ -55,6 +55,9 @@ module carrySelect_4bit
     fullAdder adder3_c1 (.a(A[3]), .b(B[3]), .s(sum_c1[3]), .cin(c_c1[2]), .cout(c_c1[3]));
     mux_2in S3_mux (.a1(sum_c1[3]), .b0(sum_c0[3]), .s(CI), .out(S[3]));
 
+    // Determine carry output
+    mux_2in carry_mux (.a1(c_c1[3]), .b0(c_c0[3]), .out(CO), .s(CI));
+
 endmodule
 
 module mux_2in
