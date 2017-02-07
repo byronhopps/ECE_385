@@ -25,13 +25,13 @@ module carrySelect_4bit
 
 endmodule
 
-module fullAdder
+module mux_2in
 (
-    input   logic   a,b,ci,
-    output  logic   s,co
+    input   logic[1:0]      a,
+    input   logic           s,
+    output  logic           out
 );
 
-    assign s = a ^ b ^ ci;
-    assign co = (a & b) | (b & ci) | (ci & a);
+//    assign out = (a[1] & s) | 
 
 endmodule
