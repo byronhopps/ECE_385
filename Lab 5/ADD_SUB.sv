@@ -1,9 +1,10 @@
-module ADD_SUB 
-( 
+module ADD_SUB ( 
 	input 	[7:0] A, B,
 	input 	fn,
-	output 	[8:0] S 
-);
+	output 	[8:0] S);
+
+    // fn == 1: A - B
+    // fn == 0: A + B
 
 	logic c0, c1, c2, c3, c4, c5, c6, c7; //internal carries in the 8-bit adder
 	logic [7:0] BB; //internal B or NOT(B)
@@ -26,12 +27,11 @@ module ADD_SUB
 	
 endmodule
 
-module counter 
-( 
-	input 	[3:0] C,
-	input 	fn,
-	output 	[4:0] CO 
-);
+module add_4bit ( 
+	input 	[3:0] C, D,
+	input 	cin,
+	output 	[3:0] S,
+    output cout);
 
 	logic c0, c1, c2 , c3; //internal carries in the 8-bit adder
 	logic [4:0] D;
