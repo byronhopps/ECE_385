@@ -80,6 +80,11 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
         endcase
     end
 
+    // Module declarations
+    add_4bit Cincrement (.C, .D(4'h0), .cin(1'b1), .S(Cinc));
+    ADD_SUB add_sub (.A, .B(S), .fn(C[3]), .S(Asum));
+    shifter ABshift (.A, .B, .Ashift, .Bshift);
+
 
 endmodule
 
