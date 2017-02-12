@@ -21,6 +21,18 @@ module multiplier_8bit (input logic  Clk, Reset, ClearA_LoadB, Run,
     logic [7:0] A, Anext, B, Bnext;
     logic [3:0] C, Cnext;
 
+    // Update register values on clock edge
+    always_ff @ (posedge Clk)
+    begin
+        if (Reset)
+            curState <= reset;
+        else
+            curState <= nextState;
+            A <= Anext;
+            B <= Bnext;
+            C <= Cnext;
+    end
+
 endmodule
 
 
