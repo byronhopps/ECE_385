@@ -33,6 +33,49 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
             C <= Cnext;
     end
 
+    always_comb begin
+
+        // Default register values is current value
+        Anext = A;
+        Bnext = B;
+        Cnext = C;
+
+        // Change register values depending on state
+        case (curState)
+
+            // Reset: Store zero in all registers
+            reset: begin
+                Anext = 0;
+                Bnext = 0;
+                Cnext = 0;
+            end
+
+            // ClearA_LoadB: Store 0 in A and load value in S to B
+            clrA_ldB: begin
+                Anext = 0;
+                Bnext = S;
+            end
+
+            // Count: Store C+1 in C
+            count: begin
+                Cnext = Cinc;
+            end
+
+            // Add: Store A+S in A (or A-S in some cases)
+            // The logic for A-S is handled elsewhere
+            add: begin
+                Anext = Asum;
+            end
+
+            // Shift: Store XAB >> 1 in A and B
+            shift: begin
+                Anext = Ashift;
+                Bnext = Bshift;
+            end
+        endcase
+    end
+
+
 endmodule
 
 
