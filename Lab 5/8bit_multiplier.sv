@@ -78,6 +78,10 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     ADD_SUB add_sub (.A, .B(S), .fn(C[3]), .S(Asum));
     shifter ABshift (.A, .B, .Ashift, .Bshift);
 
+    // Hex driver outputs
+    HexDriver HexA (.In1(A[7:4]), .In0(A[3:0]), .Out1(AhexU), .Out0(AhexL));
+    HexDriver HexB (.In1(B[7:4]), .In0(B[3:0]), .Out1(BhexU), .Out0(BhexL));
+
 
 endmodule
 
