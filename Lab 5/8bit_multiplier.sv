@@ -1,11 +1,3 @@
-/*Inputs
-S – logic [7:0]
-Clk, Reset, Run, ClearA_LoadB – logic
-Outputs
-AhexU, AhexL, BhexU, BhexL – logic [6:0]
-Aval, Bval – logic [7:0]
-X –logic*/
-
 // typedef that defines the type "state" as an enum
 typedef enum logic [3:0] {ready, reset, clrA_ldB, count, add, shift, done} state;
 
@@ -22,9 +14,19 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     logic [7:0] A, Anext, B, Bnext;
     logic [3:0] C, Cnext;
 
+    // Assign outputs
+    assign Aval = A;
+    assign Bval = B;
+    assign X = A[7];
+    assign M = B[0];
+
     // Declare intermediate register values
     logic [7:0] Asum, Ashift, Bshift;
     logic [3:0] Cinc;
+
+    // Module which figures out the next state
+    stateSelector nextStateGen (.Clk, .Reset, .ClearA_LoadB, .Run, .C(C[3]), .M(B[0]),
+                                .curState, .nextState);
 
     // Update register values on clock edge
     always_ff @ (posedge Clk)
@@ -38,6 +40,7 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
             C <= Cnext;
     end
 
+    // Determine next register value
     always_comb begin
 
         // Default register values is current value
@@ -47,6 +50,11 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
 
         // Change register values depending on state
         case (curState)
+
+            // Ready: Clear the multiply counter
+            ready: begin
+                Cnext = 0;
+            end
 
             // Reset: Store zero in all registers
             reset: begin
@@ -80,6 +88,20 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
         endcase
     end
 
+    // Module declarations
+    add_4bit Cincrement (.C, .D(4'h0), .cin(1'b1), .S(Cinc));
+    ADD_SUB add_sub (.A, .B(S), .fn(C[3]), .S(Asum));
+    shifter ABshift (.A, .B, .Ashift, .Bshift);
+
+    // Hex driver outputs
+    HexDriver HexA (.In1(A[7:4]), .In0(A[3:0]), .Out1(AhexU), .Out0(AhexL));
+    HexDriver HexB (.In1(B[7:4]), .In0(B[3:0]), .Out1(BhexU), .Out0(BhexL));
+
+    initial begin
+        curState = ready;
+        A = 0;
+        B = 0;
+    end
 
 endmodule
 
