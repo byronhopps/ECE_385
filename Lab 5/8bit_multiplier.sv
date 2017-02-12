@@ -24,6 +24,10 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     logic [7:0] Asum, Ashift, Bshift;
     logic [3:0] Cinc;
 
+    // Module which figures out the next state
+    stateSelector nextStateGen (.Clk, .Reset, .ClearA_LoadB, .Run, .C(C[3]), .M(B[0]),
+                                .curState, .nextState);
+
     // Update register values on clock edge
     always_ff @ (posedge Clk)
     begin
