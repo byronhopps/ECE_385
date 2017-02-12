@@ -51,6 +51,11 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
         // Change register values depending on state
         case (curState)
 
+            // Ready: Clear the multiply counter
+            ready: begin
+                Cnext = 0;
+            end
+
             // Reset: Store zero in all registers
             reset: begin
                 Anext = 0;
