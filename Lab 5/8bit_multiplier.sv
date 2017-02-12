@@ -14,6 +14,13 @@ module multiplier_8bit (input logic  Clk, Reset, ClearA_LoadB, Run,
                         output logic        X, M,
                         output logic [6:0]  AhexL, AhexU, BhexL, BhexU);
 
+    // Declare variables for the current and next states
+    state curState, nextState;
+
+    // Declare A, B, and C registers as well as their next value
+    logic [7:0] A, Anext, B, Bnext;
+    logic [3:0] C, Cnext;
+
 endmodule
 
 
