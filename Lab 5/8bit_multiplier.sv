@@ -6,6 +6,7 @@ AhexU, AhexL, BhexU, BhexL – logic [6:0]
 Aval, Bval – logic [7:0]
 X –logic*/
 
+// typedef that defines the type "state" as an enum
 typedef enum logic [3:0] {ready, reset, clrA_ldB, count, add, shift, done} state;
 
 module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
@@ -82,8 +83,6 @@ endmodule
 module stateSelector (input  logic Clk, Reset, ClearA_LoadB, Run, C, M,
                       input  state curState,
                       output state nextState);
-
-//enum logic [3:0] {ready, reset, clrA_ldB, count, add, shift, done} curState, nextState;
 
     // Assign outputs based on state
     always_comb begin
