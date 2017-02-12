@@ -1,11 +1,3 @@
-/*Inputs
-S – logic [7:0]
-Clk, Reset, Run, ClearA_LoadB – logic
-Outputs
-AhexU, AhexL, BhexU, BhexL – logic [6:0]
-Aval, Bval – logic [7:0]
-X –logic*/
-
 // typedef that defines the type "state" as an enum
 typedef enum logic [3:0] {ready, reset, clrA_ldB, count, add, shift, done} state;
 
@@ -38,6 +30,7 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
             C <= Cnext;
     end
 
+    // Determine next register value
     always_comb begin
 
         // Default register values is current value
