@@ -26,21 +26,21 @@ end
 
 // Tests start here
 initial begin : TEST_VECTORS
-    Reset = 1;
-    ClearA_LoadB = 0;
-    Run = 0;
+    Reset = 0;
+    ClearA_LoadB = 1;
+    Run = 1;
 
-#2  Reset = 0;
+#2  Reset = 1;
 
 // Load values
     S = 8'b11000101;
-#2  ClearA_LoadB = 1;
-#4  ClearA_LoadB = 0;
+#2  ClearA_LoadB = 0;
+#4  ClearA_LoadB = 1;
     S = 8'b00000111;
 
 // Run multiplier
-#2  Run = 1;
-#50 Run = 0;
+#2  Run = 0;
+#50 Run = 1;
 
 // Check answer
     ansA = 8'b11111110;
@@ -50,13 +50,13 @@ initial begin : TEST_VECTORS
 
 // Load values
     S = 8'b00000111;
-#2  ClearA_LoadB = 1;
-#4  ClearA_LoadB = 0;
+#2  ClearA_LoadB = 0;
+#4  ClearA_LoadB = 1;
     S = 8'b11000101;
 
 // Run multiplier
-#2  Run = 1;
-#50 Run = 0;
+#2  Run = 0;
+#50 Run = 1;
 
 // Check answer
     ansA = 8'b11111110;

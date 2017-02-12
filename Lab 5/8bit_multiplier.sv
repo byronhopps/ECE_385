@@ -31,7 +31,7 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     // Update register values on clock edge
     always_ff @ (posedge Clk)
     begin
-        if (Reset)
+        if (Reset == 0)
             curState <= reset;
         else
             curState <= nextState;
@@ -121,15 +121,15 @@ module stateSelector (input  logic Clk, Reset, ClearA_LoadB, Run, C, M,
 
             // Ready state
             ready: begin
-                if (Run == 1'b1)
+                if (Run == 1'b0)
                     nextState = count;
-                else if (ClearA_LoadB == 1'b1)
+                else if (ClearA_LoadB == 1'b0)
                     nextState = clrA_ldB;
             end
 
             // Reset state
             reset: begin
-                if (Reset == 1'b0)
+                if (Reset == 1'b1)
                     nextState = ready;
             end
 
@@ -157,7 +157,7 @@ module stateSelector (input  logic Clk, Reset, ClearA_LoadB, Run, C, M,
 
             // Done state
             done: begin
-                if (Run == 1'b0)
+                if (Run == 1'b1)
                     nextState = ready;
             end
         endcase
