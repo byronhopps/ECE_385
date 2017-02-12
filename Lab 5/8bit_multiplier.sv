@@ -14,6 +14,12 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     logic [7:0] A, Anext, B, Bnext;
     logic [3:0] C, Cnext;
 
+    // Assign outputs
+    assign Aval = A;
+    assign Bval = B;
+    assign X = A[7];
+    assign M = B[0];
+
     // Declare intermediate register values
     logic [7:0] Asum, Ashift, Bshift;
     logic [3:0] Cinc;
