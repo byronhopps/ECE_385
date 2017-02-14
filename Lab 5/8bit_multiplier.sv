@@ -11,17 +11,19 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
     state curState, nextState;
 
     // Declare A, B, and C registers as well as their next value
-    logic [7:0] A, Anext, B, Bnext;
+    logic [8:0] A, Anext;
+    logic [7:0] B, Bnext;
     logic [3:0] C, Cnext;
 
     // Assign outputs
-    assign Aval = A;
+    assign Aval = A[7:0];
     assign Bval = B;
-    assign X = A[7];
+    assign X = A[8];
     assign M = B[0];
 
     // Declare intermediate register values
-    logic [7:0] Asum, Ashift, Bshift;
+    logic [8:0] Asum, Ashift;
+    logic [7:0] Bshift;
     logic [3:0] Cinc;
 
     // Module which figures out the next state
@@ -95,7 +97,7 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
 
     // Module declarations
     add_4bit Cincrement (.C, .D(4'h0), .cin(1'b1), .S(Cinc));
-    ADD_SUB add_sub (.A, .B(S), .fn(C[3]), .S(Asum));
+    ADD_SUB add_sub (.A(A[7:0]), .B(S), .fn(C[3]), .S(Asum));
     shifter ABshift (.A, .B, .Ashift, .Bshift);
 
     // Hex driver outputs

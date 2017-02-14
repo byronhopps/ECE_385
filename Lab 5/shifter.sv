@@ -1,8 +1,11 @@
-module shifter (input  logic [7:0] A, B,
-                output logic [7:0] Ashift, Bshift); 
+module shifter (input  logic [8:0] A,
+                input  logic [7:0] B,
+                output logic [8:0] Ashift,
+                output logic [7:0] Bshift); 
 
     always_comb begin
-        Ashift[7] = A[7];
+        Ashift[8] = A[8];
+        Ashift[7] = A[8];
         Ashift[6] = A[7];
         Ashift[5] = A[6];
         Ashift[4] = A[5];

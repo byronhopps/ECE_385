@@ -8,10 +8,7 @@ module ADD_SUB (
 
 	logic c0, c1, c2, c3, c4, c5, c6, c7; //internal carries in the 8-bit adder
 	logic [7:0] BB; //internal B or NOT(B)
-	logic A8, BB8; //internal sign extension bits
-	
-	assign BB = (B ^ {8{fn}}); // when fn=1, complement B
-	assign A8 = A[7]; assign BB4 = BB[7]; // Sign extension bits
+    assign BB = (B ^ {8{fn}}); // when fn=1, complement B
 	
 	// copied from sign-bits
 	fullAdder FA0(.x(A[0]), .y(BB[0]), .z(fn), .s(S[0]), .c(c0));
@@ -22,9 +19,8 @@ module ADD_SUB (
 	fullAdder FA5(.x(A[5]), .y(BB[5]), .z(c4), .s(S[5]), .c(c5));
 	fullAdder FA6(.x(A[6]), .y(BB[6]), .z(c5), .s(S[6]), .c(c6));
 	fullAdder FA7(.x(A[7]), .y(BB[7]), .z(c6), .s(S[7]), .c(c7));
-	fullAdder FA8(.x(A8), .y(BB8), .z(c7), .s (S[8]), .c());
-	//this should work as well (.x(A[7]), .y(BB[7]), .z(c7), .s(S[8]), .c())
-	
+	fullAdder FA8(.x(A[7]), .y(BB[7]), .z(c7), .s(S[8]), .c());
+
 endmodule
 
 module add_4bit ( 
