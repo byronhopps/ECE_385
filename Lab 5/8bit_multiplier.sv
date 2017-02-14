@@ -1,5 +1,5 @@
 // typedef that defines the type "state" as an enum
-typedef enum logic [3:0] {ready, reset, clrA_ldB, count, add, shift, done} state;
+typedef enum logic [3:0] {ready, reset, clearA, clrA_ldB, count, add, shift, done} state;
 
 module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
                         input  logic [7:0]  S,
@@ -63,6 +63,11 @@ module multiplier_8bit (input  logic        Clk, Reset, ClearA_LoadB, Run,
                 Cnext = 0;
             end
 
+            // ClearA: Store 0 in A
+            clearA: begin
+                Anext = 0;
+            end
+
             // ClearA_LoadB: Store 0 in A and load value in S to B
             clrA_ldB: begin
                 Anext = 0;
@@ -122,7 +127,7 @@ module stateSelector (input  logic Clk, Reset, ClearA_LoadB, Run, C, M,
             // Ready state
             ready: begin
                 if (Run == 1'b0)
-                    nextState = count;
+                    nextState = clearA;
                 else if (ClearA_LoadB == 1'b0)
                     nextState = clrA_ldB;
             end
@@ -132,6 +137,9 @@ module stateSelector (input  logic Clk, Reset, ClearA_LoadB, Run, C, M,
                 if (Reset == 1'b1)
                     nextState = ready;
             end
+
+            // Clear A state
+            clearA: nextState = count;
 
             // ClearA_LoadB state
             clrA_ldB: nextState = ready;
