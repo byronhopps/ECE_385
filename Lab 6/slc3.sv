@@ -75,6 +75,7 @@ Mem2IO memory_subsystem(
 	.*, .Reset(Reset_ah), .ADDR(ADDR), .Switches(S),
 //	Uncomment the following line for Week 2 to patch Hex display into Mem2IO
 //	.HEX0(hex_4[0][3:0]), .HEX1(hex_4[1][3:0]), .HEX2(hex_4[2][3:0]), .HEX3(hex_4[3][3:0]),
+    .HEX0(), .HEX1(), .HEX2(), .HEX3(),
 	.Data_from_CPU(MDR), .Data_to_CPU(MDR_In),
 	.Data_from_SRAM(Data_from_SRAM), .Data_to_SRAM(Data_to_SRAM)
 );

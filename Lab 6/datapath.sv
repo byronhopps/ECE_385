@@ -5,8 +5,8 @@ module datapath (
     input logic [1:0] PCMUX, ADDR2MUX, ALUK,
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
 
-    output logic [15:0] MDR, MAR, PC, IR,
-    output logic [12:0] LED,
+    output logic [15:0] MDR, MAR, IR,
+    output logic [11:0] LED,
     output logic BEN
 );
 
@@ -15,7 +15,7 @@ module datapath (
     // ------------------
 
     // Define registers and register inputs
-    logic [15:0] PCnext;
+    logic [15:0] PC, PCnext;
     logic [15:0] MDRnext;
     logic [15:0] MARnext;
     logic N, Z, P;
@@ -46,7 +46,6 @@ module datapath (
     assert property (!({GatePC, GateMDR, GateALU, GateMARMUX} & ({GatePC, GateMDR, GateALU, GateMARMUX} - 1)))
         else $error("Improper gateing of main CPU bus");
 
-
     // -------
     // Modules
     // -------
@@ -70,13 +69,13 @@ module datapath (
             IR <= IR;
 
         // Update value of CC
-        if (LD_CC == 1)
+        if (LD_CC == 1) begin
             // TODO: Verify this works
             P = (mainBus > 0);
             Z = (mainBus == 0);
             N = (mainBus < 0);
-        else
-            CC <= CC;
+        end
+        // Assuming that state is preserved
 
         // Update value of MDR
         if (LD_MDR == 1)
@@ -97,7 +96,7 @@ module datapath (
             BEN <= BEN;
 
         if (LD_LED == 1)
-            LED <= IR[12:0];
+            LED <= IR[11:0];
         else
             LED <= LED;
     end
@@ -119,7 +118,7 @@ module datapath (
 
         // PC mux
         case (PCMUX)
-            PCMUX::PC_PLUS1 : PCnext = PC + 1;
+            PCMUX::PC_PLUS1 : PCnext = PC + 1'b1;
             PCMUX::ADDR_SUM : PCnext = MARMUX;
             PCMUX::DATA_BUS : PCnext = mainBus;
             default : begin
@@ -138,7 +137,7 @@ module datapath (
         case (ADDR2MUX)
             ADDR2MUX::ZERO  : MARMUX2 = 0;
             ADDR2MUX::IR_5  : MARMUX2 = $signed(IR[5:0]); //TODO: Verify this works
-            ADDR2MUX::IR_8  : MARMUX2 = { {8{IR[8]}}, IR[8:0]}; //TODO: Verify this works
+            ADDR2MUX::IR_8  : MARMUX2 = { {7{IR[8]}}, IR[8:0]}; //TODO: Verify this works
             ADDR2MUX::IR_10 : MARMUX2 = $signed(IR[10:0]);
         endcase
 
