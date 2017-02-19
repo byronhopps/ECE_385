@@ -2,7 +2,7 @@
 // Company: 		 UIUC ECE Dept.
 // Engineer:		 Stephen Kempf
 //
-// Create Date:    
+// Create Date:    Feb. 18, 2017
 // Design Name:    ECE 385 Lab 6 Given Code - SLC-3 top-level (External SRAM)
 // Module Name:    SLC3
 //
