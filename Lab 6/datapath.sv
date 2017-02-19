@@ -6,6 +6,7 @@ module datapath (
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
 
     output logic [15:0] MDR, MAR, PC, IR,
+    output logic [12:0] LED,
     output logic BEN
 );
 
@@ -94,6 +95,11 @@ module datapath (
             BEN <= ((IR[11] & N) | (IR[10] & Z) | (IR[9] & P));
         else
             BEN <= BEN;
+
+        if (LD_LED == 1)
+            LED <= IR[12:0];
+        else
+            LED <= LED;
     end
 
     // Multiplexers for various functions
