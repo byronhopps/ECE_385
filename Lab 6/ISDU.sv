@@ -92,10 +92,10 @@ module ISDU (
                         nextState <= S_18;
                     end
                 endcase
-            S_01 : 
-                nextState <= S_18;
+            end
 
-            // You need to finish the rest of states.....
+            // ADD instruction
+            S_01 : nextState <= S_18;
 
             default : ;
 
@@ -158,15 +158,24 @@ module ISDU (
             PauseIR2: ;
             S_32 : 
                 LD_BEN = 1'b1;
-            S_01 : 
-                begin 
-                    SR2MUX = IR_5;
-                    ALUK = 2'b00;
-                    GateALU = 1'b1;
-                    LD_REG = 1'b1;
-                end
+            // State 1
+            // DR <= SR1 + OP2
+            // Set CC
+            S_01 : begin 
+                SR1MUX = SR1MUX::IR_8_6;
 
-            // You need to finish the rest of states.....
+                case(IR[5])
+                    1'b0 : SR2MUX = SR2MUX::SR2_OUT;
+                    1'b1 : SR2MUX = SR2MUX::IR_SEXT;
+                endcase
+
+                DRMUX  = DRMUX::IR_11_9;
+                ALUK   = ALU_OPS::ADD;
+                GateALU = 1'b1;
+                LD_REG = 1'b1;
+                LD_CC  = 1'b1;
+            end
+
 
             default : ;
         endcase
