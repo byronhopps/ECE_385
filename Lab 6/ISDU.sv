@@ -21,7 +21,8 @@ module ISDU (
     input logic [3:0] Opcode, 
     input logic IR_5, IR_11, BEN,
       
-    output logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED, // for PAUSE instruction
+    output logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC,
+    output logic LD_LED, // for PAUSE instruction
     output logic GatePC, GateMDR, GateALU, GateMARMUX,
     output logic [1:0] PCMUX,
     output logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
