@@ -117,6 +117,9 @@ module ISDU (
                     nextState <= S_18;
             end
 
+            // JMP instruction
+            S_12 : nextState <= S_18;
+
             // Raise warning if in invalid state
             default : begin
                 $warning("Invalid state");
@@ -248,6 +251,16 @@ module ISDU (
                 PCMUX = PCMUX::ADDR_SUM;
                 ADDR1MUX = ADDR1MUX::PC;
                 ADDR2MUX = ADDR2MUX::OFF9;
+                LD_PC = 1'b1;
+            end
+
+            // State 12
+            // PC <= BaseR
+            S_12 : begin
+                SR1MUX = SR1MUX::IR_8_6;
+                ADDR1MUX = ADDR1MUX::SR1;
+                ADDR2MUX = ADDR2MUX::ZERO;
+                PCMUX = PCMUX::ADDR_SUM;
                 LD_PC = 1'b1;
             end
 
