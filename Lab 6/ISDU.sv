@@ -43,37 +43,42 @@ module ISDU (
             state <= nextState;
     end
    
-    always_comb
-    begin 
+    always_comb begin 
         // Default next state is staying at current state
         nextState = state;
      
         unique case (state)
-            Halted : 
+
+            // Stay in halted state until Run is asserted
+            Halted : begin
                 if (Run) 
                     nextState <= S_18;                      
-            S_18 : 
-                nextState <= S_33_1;
+            end
+
+            S_18 : nextState <= S_33_1;
+
             // Any states involving SRAM require more than one clock cycles.
             // The exact number will be discussed in lecture.
-            S_33_1 : 
-                nextState <= S_33_2;
-            S_33_2 : 
-                nextState <= S_35;
-            S_35 : 
-                nextState <= PauseIR1;
+            S_33_1 : nextState <= S_33_2;
+            S_33_2 : nextState <= S_35;
+
+            S_35 : nextState <= PauseIR1;
+
             // PauseIR1 and PauseIR2 are only for Week 1 such that TAs can see 
             // the values in IR. They should be removed in Week 2
-            PauseIR1 : 
+            PauseIR1 : begin
                 if (~Continue) 
                     nextState <= PauseIR1;
                 else 
                     nextState <= PauseIR2;
-            PauseIR2 : 
+            end
+
+            PauseIR2 : begin
                 if (Continue) 
                     nextState <= PauseIR2;
                 else 
                     nextState <= S_18;
+            end
 
             // Branch out from state 32 depending on the current opcode
             S_32 : begin
@@ -134,30 +139,40 @@ module ISDU (
         
         // Assign control signals based on current state
         case (state)
+
+            // These states have no output
             Halted: ;
-            S_18 : 
-                begin 
-                    GatePC = 1'b1;
-                    LD_MAR = 1'b1;
-                    PCMUX = 2'b00;
-                    LD_PC = 1'b1;
-                end
-            S_33_1 : 
+            PauseIR1 : ;
+            PauseIR2 : ;
+            // State 18
+            // MAR <= PC
+            // PC  <= PC + 1
+            S_18 : begin 
+                GatePC = 1'b1;
+                LD_MAR = 1'b1;
+                PCMUX = PCMUX::PC_PLUS1;
+                LD_PC = 1'b1;
+            end
+
+            // State 33
+            // MDR <= M[MAR]
+            S_33_1 : Mem_OE = 1'b0;
+            S_33_2 : begin // TODO: Figure out how this works
                 Mem_OE = 1'b0;
-            S_33_2 : 
-                begin 
-                    Mem_OE = 1'b0;
-                    LD_MDR = 1'b1;
-                end
-            S_35 : 
-                begin 
-                    GateMDR = 1'b1;
-                    LD_IR = 1'b1;
-                end
-            PauseIR1: ;
-            PauseIR2: ;
-            S_32 : 
-                LD_BEN = 1'b1;
+                LD_MDR = 1'b1;
+            end
+
+            // State 35
+            // IR <= MDR
+            S_35 : begin 
+                GateMDR = 1'b1;
+                LD_IR = 1'b1;
+            end
+
+            // State 32
+            // BEN <= {IR[11] & N, IR[10] & Z, IR[9] & P}
+            S_32 : LD_BEN = 1'b1; // TODO: Implement BEN
+
             // State 1
             // DR <= SR1 + OP2
             // Set CC
