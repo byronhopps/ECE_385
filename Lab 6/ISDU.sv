@@ -30,8 +30,10 @@ module ISDU (
     output logic Mem_CE, Mem_UB, Mem_LB, Mem_OE, Mem_WE
     );
 
+   // Internal state logic
     enum logic [3:0] { Halted, PauseIR1, PauseIR2,
-        S_18, S_33_1, S_33_2, S_35, S_32, S_01}   state, nextState;   // Internal state logic
+        S_00, S_04, S_12, S_13, S_18, S_20, S_22, S_33_1,
+        S_33_2, S_35, S_32, S_01, S_05, S_09}   state, nextState;
         
     always_ff @ (posedge Clk)
     begin : Assign_Next_State
