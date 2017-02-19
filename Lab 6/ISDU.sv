@@ -108,6 +108,15 @@ module ISDU (
             // NOT instruction
             S_09 : nextState <= S_18;
 
+            // BR instruction
+            S_22 : nextState <= S_18;
+            S_00 : begin
+                if (BEN == 1)
+                    nextState <= S_22;
+                else
+                    nextState <= S_18;
+            end
+
             // Raise warning if in invalid state
             default : begin
                 $warning("Invalid state");
@@ -154,6 +163,8 @@ module ISDU (
             Halted: ;
             PauseIR1 : ;
             PauseIR2 : ;
+            S_00 : ;
+
             // State 18
             // MAR <= PC
             // PC  <= PC + 1
@@ -229,6 +240,15 @@ module ISDU (
                 GateALU= 1'b1;
                 LD_REG = 1'b1;
                 LD_CC  = 1'b1;
+            end
+
+            // State 22
+            // PC <= PC + off9
+            S_22 : begin
+                PCMUX = PCMUX::ADDR_SUM;
+                ADDR1MUX = ADDR1MUX::PC;
+                ADDR2MUX = ADDR2MUX::OFF9;
+                LD_PC = 1'b1;
             end
 
             S_01 : begin
