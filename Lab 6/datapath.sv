@@ -7,11 +7,8 @@ module datapath (
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
 
     output logic [15:0] MDR, MAR, PC, IR,
-    output logic [2:0] BEN
+    output logic BEN
 );
-    // TODO List:
-    // - Implement BEN logic
-    // - Implement ALU
 
     // ------------------
     // Signal Definitions
@@ -19,10 +16,9 @@ module datapath (
 
     // Define registers and register inputs
     logic [15:0] PCnext;
-    logic [15:0] CC, CCnext; //TODO: Figure out what this is
     logic [15:0] MDRnext;
     logic [15:0] MARnext;
-    logic [2:0] BENnext;
+    logic N, Z, P;
 
     // Define main data bus
     logic [15:0] mainBus;
@@ -75,7 +71,10 @@ module datapath (
 
         // Update value of CC
         if (LD_CC == 1)
-            CC <= CCnext;
+            // TODO: Verify this works
+            P = (mainBus > 0);
+            Z = (mainBus == 0);
+            N = (mainBus < 0);
         else
             CC <= CC;
 
@@ -93,7 +92,7 @@ module datapath (
 
         // Update value of BEN
         if (LD_BEN == 1)
-            BEN <= BENnext;
+            BEN <= ((IR[11] & N) | (IR[10] & Z) | (IR[9] & P));
         else
             BEN <= BEN;
     end
