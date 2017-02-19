@@ -10,7 +10,10 @@ module ALU (
             ALU_OPS::ADD : OUT = A + B;
             ALU_OPS::AND : OUT = A & B;
             ALU_OPS::NOT : OUT = ~A;
-            default : OUT = A + B;
+            default : begin
+                OUT = '0;
+                $warning("Unspecified ALU operation");
+            end
         endcase
     end
 

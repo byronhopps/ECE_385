@@ -111,7 +111,10 @@ module datapath (
             4'b0100 : mainBus = MDR;
             4'b0010 : mainBus = ALU_OUT;
             4'b0001 : mainBus = MARMUX;
-            default : $error("Unspecified output on main bus");
+            default : begin
+                mainBus = '0;
+                $error("Unspecified output on main bus");
+            end
         endcase
 
         // PC mux
@@ -119,7 +122,10 @@ module datapath (
             PCMUX::PC_PLUS1 : PCnext = PC + 1;
             PCMUX::ADDR_SUM : PCnext = MARMUX;
             PCMUX::DATA_BUS : PCnext = mainBus;
-            default : $error("Unspecified output on PCMUX");
+            default : begin
+                PCnext = '0;
+                $error("Unspecified output on PCMUX");
+            end
         endcase
 
         // MARMUX 1
