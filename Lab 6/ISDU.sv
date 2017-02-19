@@ -74,15 +74,23 @@ module ISDU (
                     nextState <= PauseIR2;
                 else 
                     nextState <= S_18;
-            S_32 : 
+
+            // Branch out from state 32 depending on the current opcode
+            S_32 : begin
                 case (Opcode)
-                    4'b0001 : 
-                        nextState <= S_01;
+                    OPCODE::ADD : nextState <= S_01;
+                    OPCODE::AND : nextState <= S_05;
+                    OPCODE::NOT : nextState <= S_09;
+                    OPCODE::BR  : nextState <= S_00;
+                    OPCODE::JMP : nextState <= S_12;
+                    OPCODE::JSR : nextState <= S_04;
+                    OPCODE::PSE : nextState <= S_13;
 
-                    // You need to finish the rest of opcodes.....
-
-                    default : 
+                    // Raise warning for unimplemted opcode
+                    default : begin
+                        $warning("Unimplemented Opcode");
                         nextState <= S_18;
+                    end
                 endcase
             S_01 : 
                 nextState <= S_18;
