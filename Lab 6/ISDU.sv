@@ -102,6 +102,9 @@ module ISDU (
             // ADD instruction
             S_01 : nextState <= S_18;
 
+            // AND instruction
+            S_05 : nextState <= S_18;
+
             // Raise warning if in invalid state
             default : begin
                 $warning("Invalid state");
@@ -191,6 +194,24 @@ module ISDU (
                 DRMUX  = DRMUX::IR_11_9;
                 ALUK   = ALU_OPS::ADD;
                 GateALU = 1'b1;
+                LD_REG = 1'b1;
+                LD_CC  = 1'b1;
+            end
+
+            // State 5
+            // DR <= SR1 & OP2
+            // Set CC
+            S_05 : begin
+                SR1MUX = SR1MUX::IR_8_6;
+
+                case(IR[5])
+                    1'b0 : SR2MUX = SR2MUX::SR2_OUT;
+                    1'b1 : SR2MUX = SR2MUX::IR_SEXT;
+                endcase
+
+                DRMUX  = DRMUX::IR_11_9;
+                ALUK   = ALU_OPS::AND;
+                GateALU= 1'b1;
                 LD_REG = 1'b1;
                 LD_CC  = 1'b1;
             end
