@@ -63,5 +63,39 @@ initial begin : TEST_VECTORS
     ansB = 8'b01100011;
     if (Aval != ansA) errors++;
     if (Bval != ansB) errors++;
+	 
+	 
+// Load values
+    S = 8'b00111011;
+#2  ClearA_LoadB = 0;
+#4  ClearA_LoadB = 1;
+    S = 8'b00000111;
+
+// Run multiplier
+#2  Run = 0;
+#50 Run = 1;
+
+// Check answer
+    ansA = 8'b00000001;
+    ansB = 8'b10011101;
+    if (Aval != ansA) errors++;
+    if (Bval != ansB) errors++;
+
+// Load values
+    S = 8'b11111001;
+#2  ClearA_LoadB = 0;
+#4  ClearA_LoadB = 1;
+    S = 8'b11000101;
+
+// Run multiplier
+#2  Run = 0;
+#50 Run = 1;
+
+// Check answer
+    ansA = 8'b00000001;
+    ansB = 8'b10011101;
+    if (Aval != ansA) errors++;
+    if (Bval != ansB) errors++;
+
 end
 endmodule
