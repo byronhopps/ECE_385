@@ -14,11 +14,14 @@ package ADDR2MUX;
     parameter ZERO  = 2'b00;
     parameter IR_5  = 2'b01;
     parameter IR_8  = 2'b10;
+    parameter OFF9  = 2'b10;
     parameter IR_10 = 2'b11;
+    parameter OFF11 = 2'b11;
 endpackage
 
 package SR1MUX;
     parameter IR_8_6  = 1'b0;
+    parameter BASER   = 1'b0;
     parameter IR_11_9 = 1'b1;
 endpackage
 
@@ -30,6 +33,7 @@ endpackage
 package DRMUX;
     parameter IR_11_9 = 1'b0;
     parameter ONES    = 1'b1;
+    parameter SEVEN   = 1'b1;
 endpackage
 
 package ALU_OPS;
