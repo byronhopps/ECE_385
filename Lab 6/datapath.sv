@@ -3,7 +3,6 @@ module datapath (
     input logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED,
     input logic GatePC, GateMDR, GateALU, GateMARMUX,
     input logic [1:0] PCMUX, ADDR2MUX, ALUK,
-    input logic [2:0] SR2,
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
 
     output logic [15:0] MDR, MAR, PC, IR,
@@ -51,7 +50,7 @@ module datapath (
     // Modules
     // -------
 
-    regFile register_file (.Clk, .mainBus, .DR, .SR1, .SR2, .LD_REG, .SR1_OUT, .SR2_OUT);
+    regFile register_file (.Clk, .mainBus, .DR, .SR1, .SR2(IR[2:0]), .LD_REG, .SR1_OUT, .SR2_OUT);
     ALU ALU_MAIN (.A(SR1_OUT), .B(SR2MUX_OUT), .ALUK, .OUT(ALU_OUT));
 
     // Update registers on clock edge when load is asserted
