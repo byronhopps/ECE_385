@@ -124,6 +124,9 @@ module ISDU (
             S_04 : nextState <= S_20;
             S_20 : nextState <= S_18;
 
+            // PSE instruction
+            S_13 : nextState <= S_18;
+
             // Raise warning if in invalid state
             default : begin
                 $warning("Invalid state");
@@ -285,6 +288,10 @@ module ISDU (
                 PCMUX = PCMUX::ADDR_SUM;
                 LD_PC = 1'b1;
             end
+
+            // State 13
+            // LED <- ledVect12
+            S_13 : LD_LED = 1'b1;
 
 
             default : ;
