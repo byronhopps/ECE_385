@@ -37,3 +37,15 @@ package ALU_OPS;
     parameter AND = 2'b01;
     parameter NOT = 2'b10;
 endpackage
+
+package OPCODE;
+    parameter ADD = 4'b0001;
+    parameter AND = 4'b0101;
+    parameter NOT = 4'b1001;
+    parameter BR  = 4'b0000;
+    parameter JMP = 4'b1100;
+    parameter JSR = 4'b0100;
+    parameter LDR = 4'b0110;
+    parameter STR = 4'b0111;
+    parameter PSE = 4'b1101;
+endpackage
