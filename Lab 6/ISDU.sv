@@ -102,7 +102,11 @@ module ISDU (
             // ADD instruction
             S_01 : nextState <= S_18;
 
-            default : ;
+            // Raise warning if in invalid state
+            default : begin
+                $warning("Invalid state");
+                nextState <= S_18;
+            end
 
          endcase
     end
