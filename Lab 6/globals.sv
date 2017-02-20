@@ -21,7 +21,7 @@ endpackage
 
 package SR1MUX;
     parameter IR_8_6  = 1'b0;
-    parameter BASER   = 1'b0;
+    parameter BASE_R   = 1'b0;
     parameter IR_11_9 = 1'b1;
 endpackage
 
