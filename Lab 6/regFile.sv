@@ -15,7 +15,7 @@ module regFile (
 
     always_ff @ (posedge Clk) begin
 //        for (i = 0; i < 8; i++)
-//            REG[DR] <= REG[DR];
+//            REG[i] <= REG[i];
 // TODO: Verify if this is needed
 
         if (LD_REG == 1)

@@ -31,7 +31,7 @@ module ISDU (
     );
 
    // Internal state logic
-    enum logic [3:0] { Halted, PauseIR1, PauseIR2,
+    enum logic [5:0] { Halted, PauseIR1, PauseIR2,
         S_00, S_04, S_12, S_13, S_18, S_20, S_22, S_33_1,
         S_33_2, S_35, S_32, S_01, S_05, S_09}   state, nextState;
         
@@ -136,8 +136,8 @@ module ISDU (
          endcase
     end
    
-    always_comb
-    begin 
+    always_comb begin 
+
         // default controls signal values; within a process, these can be
         // overridden further down (in the case statement, in this case)
         LD_MAR = 1'b0;
@@ -202,7 +202,7 @@ module ISDU (
 
             // State 32
             // BEN <= {IR[11] & N, IR[10] & Z, IR[9] & P}
-            S_32 : LD_BEN = 1'b1; // TODO: Implement BEN
+            S_32 : LD_BEN = 1'b1;
 
             // State 1
             // DR <= SR1 + OP2
@@ -210,7 +210,7 @@ module ISDU (
             S_01 : begin 
                 SR1MUX = SR1MUX::IR_8_6;
 
-                case(IR[5])
+                case(IR_5)
                     1'b0 : SR2MUX = SR2MUX::SR2_OUT;
                     1'b1 : SR2MUX = SR2MUX::IR_SEXT;
                 endcase
@@ -228,7 +228,7 @@ module ISDU (
             S_05 : begin
                 SR1MUX = SR1MUX::IR_8_6;
 
-                case(IR[5])
+                case(IR_5)
                     1'b0 : SR2MUX = SR2MUX::SR2_OUT;
                     1'b1 : SR2MUX = SR2MUX::IR_SEXT;
                 endcase
