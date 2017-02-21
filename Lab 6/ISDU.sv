@@ -43,7 +43,7 @@ module ISDU (
         else 
             state <= nextState;
     end
-   
+
     always_comb begin 
         // Default next state is staying at current state
         nextState = state;
