@@ -4,12 +4,10 @@ timeunit 10ns;
 timeprecision 1ns;
 
 // Internal logic signals
-	input logic [15:0] S,
-	input logic	Clk, Reset, Run, Continue,
-	output logic [11:0] LED,
-	output logic [6:0] HEX0, HEX1, HEX2, HEX3
-	//logic CE, UB, LB, OE, WE;
-   //logic [19:0] ADDR;
+logic [15:0] S;
+logic	Clk, Reset, Run, Continue;
+logic [11:0] LED;
+logic [6:0] HEX0, HEX1, HEX2, HEX3;
 
 // Instantiating the DUT
 // module and signal name
@@ -22,13 +20,19 @@ end
 
 initial begin: CLOCK_INITIALIZATION
     Clk = 0;
-end 
+end
 
 
 // Tests start here
 initial begin : TEST_VECTORS
-#2   Reset = 1;
-#2   Run = 1;
+    S = 16'd3;
+    Run = 1;
+//  Continue = 1;
+#4  Reset = 1;
+#4  Reset = 0;
+#4  Reset = 1;
+#4  Run = 0;
+#4  Run = 1;
 
 end
 endmodule
