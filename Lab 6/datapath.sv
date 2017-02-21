@@ -43,8 +43,8 @@ module datapath (
     // ----------
 
     // Assert that only one of the gates can be high at any time
-    assert property (!({GatePC, GateMDR, GateALU, GateMARMUX} & ({GatePC, GateMDR, GateALU, GateMARMUX} - 1)))
-        else $error("Improper gateing of main CPU bus");
+    //assert property (!({GatePC, GateMDR, GateALU, GateMARMUX} & ({GatePC, GateMDR, GateALU, GateMARMUX} - 1)))
+    //    else $error("Improper gateing of main CPU bus");
 
     // -------
     // Modules
@@ -118,9 +118,9 @@ module datapath (
 
         // PC mux
         case (PCMUX)
-            PCMUX::PC_PLUS1 : PCnext = PC + 1'b1;
-            PCMUX::ADDR_SUM : PCnext = MARMUX;
-            PCMUX::DATA_BUS : PCnext = mainBus;
+            PCMUX_PKG::PC_PLUS1 : PCnext = PC + 1'b1;
+            PCMUX_PKG::ADDR_SUM : PCnext = MARMUX;
+            PCMUX_PKG::DATA_BUS : PCnext = mainBus;
             default : begin
                 PCnext = '0;
                 $error("Unspecified output on PCMUX");
@@ -129,34 +129,34 @@ module datapath (
 
         // MARMUX 1
         case (ADDR1MUX)
-            ADDR1MUX::SR1 : MARMUX1 = SR1_OUT;
-            ADDR1MUX::PC  : MARMUX1 = PC;
+            ADDR1MUX_PKG::SR1 : MARMUX1 = SR1_OUT;
+            ADDR1MUX_PKG::PC  : MARMUX1 = PC;
         endcase
 
         // MARMUX 2
         case (ADDR2MUX)
-            ADDR2MUX::ZERO  : MARMUX2 = 0;
-            ADDR2MUX::IR_5  : MARMUX2 = $signed(IR[5:0]); //TODO: Verify this works
-            ADDR2MUX::IR_8  : MARMUX2 = { {7{IR[8]}}, IR[8:0]}; //TODO: Verify this works
-            ADDR2MUX::IR_10 : MARMUX2 = $signed(IR[10:0]);
+            ADDR2MUX_PKG::ZERO  : MARMUX2 = 0;
+            ADDR2MUX_PKG::IR_5  : MARMUX2 = $signed(IR[5:0]); //TODO: Verify this works
+            ADDR2MUX_PKG::IR_8  : MARMUX2 = { {7{IR[8]}}, IR[8:0]}; //TODO: Verify this works
+            ADDR2MUX_PKG::IR_10 : MARMUX2 = $signed(IR[10:0]);
         endcase
 
         // SR1mux
         case (SR1MUX)
-            SR1MUX::IR_8_6  : SR1 = IR[8:6];
-            SR1MUX::IR_11_9 : SR1 = IR[11:9];
+            SR1MUX_PKG::IR_8_6  : SR1 = IR[8:6];
+            SR1MUX_PKG::IR_11_9 : SR1 = IR[11:9];
         endcase
 
         // SR2mux
         case (SR2MUX)
-            SR2MUX::SR2_OUT : SR2MUX_OUT = SR2_OUT;
-            SR2MUX::IR_SEXT : SR2MUX_OUT = $signed(IR[4:0]); // TODO: Verify this works
+            SR2MUX_PKG::SR2_OUT : SR2MUX_OUT = SR2_OUT;
+            SR2MUX_PKG::IR_SEXT : SR2MUX_OUT = $signed(IR[4:0]); // TODO: Verify this works
         endcase
 
         // DRmux
         case (DRMUX)
-            DRMUX::IR_11_9 : DR = IR[11:9];
-            DRMUX::ONES    : DR = '1;
+            DRMUX_PKG::IR_11_9 : DR = IR[11:9];
+            DRMUX_PKG::ONES    : DR = '1;
         endcase
 
     end
