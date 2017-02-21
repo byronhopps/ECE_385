@@ -17,6 +17,28 @@
 //
 //------------------------------------------------------------------------------
 
+// Temporary top-level module for week 1
+module slc3_toplevel(
+	input logic [15:0] S,
+	input logic	Clk, Reset, Run, Continue,
+	output logic [11:0] LED,
+	output logic [6:0] HEX0, HEX1, HEX2, HEX3
+);
+
+	logic CE, UB, LB, OE, WE;
+    wire [15:0] memoryIO;
+    logic [19:0] ADDR;
+
+    slc3 mainComputer (.Clk, .Reset, .Run, .Continue,
+        .LED, .HEX0, .HEX1, .HEX2, .HEX3, .ADDR, .CE, .UB, .LB, .OE, .WE,
+        .Data(memoryIO)
+    );
+
+    test_memory memoryUnit(.Clk, .Reset, .CE, .UB, .LB, .OE, .WE,
+        .I_O(memoryIO), .A(ADDR)
+    );
+endmodule
+
 
 module slc3(
 	input logic [15:0] S,
@@ -45,8 +67,11 @@ assign hex_4[2][3:0] = IR[11:8];
 assign hex_4[1][3:0] = IR[7:4];
 assign hex_4[0][3:0] = IR[3:0];
 
-// This works thanks to http://stackoverflow.com/questions/1378159/verilog-can-we-have-an-array-of-custom-modules
-HexDriver hex_drivers[3:0] (hex_4, {HEX3, HEX2, HEX1, HEX0});
+// For week 1 only
+HexDriver hex_driver3 (.IN(IR[15:12]), .OUT(HEX3));
+HexDriver hex_driver2 (.IN(IR[11:8]), .OUT(HEX2));
+HexDriver hex_driver1 (.IN(IR[7:4]), .OUT(HEX1));
+HexDriver hex_driver0 (.IN(IR[3:0]), .OUT(HEX0));
 
 // Internal connections
 logic BEN;
