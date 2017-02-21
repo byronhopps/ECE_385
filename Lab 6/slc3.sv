@@ -58,6 +58,18 @@ assign Reset_ah = ~Reset;
 assign Continue_ah = ~Continue;
 assign Run_ah = ~Run;
 
+// Internal connections
+logic BEN;
+logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED;
+logic GatePC, GateMDR, GateALU, GateMARMUX;
+logic [1:0] PCMUX, ADDR2MUX, ALUK;
+logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX;
+logic MIO_EN;
+
+logic [15:0] MDR_In;
+logic [15:0] MAR, MDR, IR;
+logic [15:0] Data_from_SRAM, Data_to_SRAM;
+
 // An array of 4-bit wires to connect the hex_drivers efficiently to wherever we want
 // For Week 1, they will directly be connected to the IR register
 // For Week 2, they will be patched into the MEM2IO module so that Memory-mapped IO can take place
@@ -73,18 +85,6 @@ HexDriver hex_driver3 (.IN(IR[15:12]), .OUT(HEX3));
 HexDriver hex_driver2 (.IN(IR[11:8]), .OUT(HEX2));
 HexDriver hex_driver1 (.IN(IR[7:4]), .OUT(HEX1));
 HexDriver hex_driver0 (.IN(IR[3:0]), .OUT(HEX0));
-
-// Internal connections
-logic BEN;
-logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED;
-logic GatePC, GateMDR, GateALU, GateMARMUX;
-logic [1:0] PCMUX, ADDR2MUX, ALUK;
-logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX;
-logic MIO_EN;
-
-logic [15:0] MDR_In;
-logic [15:0] MAR, MDR, IR;
-logic [15:0] Data_from_SRAM, Data_to_SRAM;
 
 // Connect MAR to ADDR, which is also connected as an input into MEM2IO
 //    MEM2IO will determine what gets put onto Data_CPU (which serves as a potential
