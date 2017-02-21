@@ -1,16 +1,16 @@
 // Values for the PCMUX selection bits
-package PCMUX;
+package PCMUX_PKG;
     parameter PC_PLUS1 = 2'b00;
     parameter ADDR_SUM = 2'b01;
     parameter DATA_BUS = 2'b10;
 endpackage
 
-package ADDR1MUX;
+package ADDR1MUX_PKG;
     parameter SR1 = 1'b0;
     parameter PC  = 1'b1;
 endpackage
 
-package ADDR2MUX;
+package ADDR2MUX_PKG;
     parameter ZERO  = 2'b00;
     parameter IR_5  = 2'b01;
     parameter IR_8  = 2'b10;
@@ -19,18 +19,18 @@ package ADDR2MUX;
     parameter OFF11 = 2'b11;
 endpackage
 
-package SR1MUX;
+package SR1MUX_PKG;
     parameter IR_8_6  = 1'b0;
     parameter BASE_R   = 1'b0;
     parameter IR_11_9 = 1'b1;
 endpackage
 
-package SR2MUX;
+package SR2MUX_PKG;
     parameter SR2_OUT = 1'b0;
     parameter IR_SEXT = 1'b1;
 endpackage
 
-package DRMUX;
+package DRMUX_PKG;
     parameter IR_11_9 = 1'b0;
     parameter ONES    = 1'b1;
     parameter SEVEN   = 1'b1;

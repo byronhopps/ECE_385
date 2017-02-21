@@ -1,9 +1,10 @@
 module datapath (
-    input logic Clk,
+    input logic Clk, Reset,
     input logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED,
     input logic GatePC, GateMDR, GateALU, GateMARMUX,
     input logic [1:0] PCMUX, ADDR2MUX, ALUK,
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
+    input logic [15:0] MDR_In,
 
     output logic [15:0] MDR, MAR, IR,
     output logic [11:0] LED,
@@ -17,7 +18,6 @@ module datapath (
     // Define registers and register inputs
     logic [15:0] PC, PCnext;
     logic [15:0] MDRnext;
-    logic [15:0] MARnext;
     logic N, Z, P;
 
     // Define main data bus
@@ -43,8 +43,8 @@ module datapath (
     // ----------
 
     // Assert that only one of the gates can be high at any time
-    assert property (!({GatePC, GateMDR, GateALU, GateMARMUX} & ({GatePC, GateMDR, GateALU, GateMARMUX} - 1)))
-        else $error("Improper gateing of main CPU bus");
+    //assert property (!({GatePC, GateMDR, GateALU, GateMARMUX} & ({GatePC, GateMDR, GateALU, GateMARMUX} - 1)))
+    //    else $error("Improper gateing of main CPU bus");
 
     // -------
     // Modules
@@ -53,20 +53,21 @@ module datapath (
     regFile register_file (.Clk, .mainBus, .DR, .SR1, .SR2(IR[2:0]), .LD_REG, .SR1_OUT, .SR2_OUT);
     ALU ALU_MAIN (.A(SR1_OUT), .B(SR2MUX_OUT), .ALUK, .OUT(ALU_OUT));
 
+    register_16 PCreg (.Clk, .Reset, .LD(LD_PC), .In(PCnext), .Out(PC));
+    register_16 IRreg (.Clk, .Reset, .LD(LD_IR), .In(mainBus), .Out(IR));
+    register_16 MDRreg (.Clk, .Reset, .LD(LD_MDR), .In(MDR_In), .Out(MDR));
+    register_16 MARreg (.Clk, .Reset, .LD(LD_MAR), .In(mainBus), .Out(MAR));
+
+    initial begin
+        PC = 0;
+        IR = 0;
+        MAR = '1;
+        LED = 0;
+        BEN = 0;
+    end
+
     // Update registers on clock edge when load is asserted
     always_ff @ (posedge Clk) begin
-
-        // Update value of PC from PCmux
-        if (LD_PC == 1)
-            PC <= PCnext;
-        else
-            PC <= PC;
-
-        // Update value of IR from main bus
-        if (LD_IR == 1)
-            IR <= mainBus;
-        else
-            IR <= IR;
 
         // Update value of CC
         if (LD_CC == 1) begin
@@ -76,18 +77,6 @@ module datapath (
             N = (mainBus < 0);
         end
         // Assuming that state is preserved
-
-        // Update value of MDR
-        if (LD_MDR == 1)
-            MDR <= MDRnext;
-        else
-            MDR <= MDR;
-
-        // Update value of MAR
-        if (LD_MAR == 1)
-            MAR <= MARnext;
-        else
-            MAR <= MAR;
 
         // Update value of BEN
         if (LD_BEN == 1)
@@ -118,9 +107,9 @@ module datapath (
 
         // PC mux
         case (PCMUX)
-            PCMUX::PC_PLUS1 : PCnext = PC + 1'b1;
-            PCMUX::ADDR_SUM : PCnext = MARMUX;
-            PCMUX::DATA_BUS : PCnext = mainBus;
+            PCMUX_PKG::PC_PLUS1 : PCnext = PC + 1'b1;
+            PCMUX_PKG::ADDR_SUM : PCnext = MARMUX;
+            PCMUX_PKG::DATA_BUS : PCnext = mainBus;
             default : begin
                 PCnext = '0;
                 $error("Unspecified output on PCMUX");
@@ -129,34 +118,34 @@ module datapath (
 
         // MARMUX 1
         case (ADDR1MUX)
-            ADDR1MUX::SR1 : MARMUX1 = SR1_OUT;
-            ADDR1MUX::PC  : MARMUX1 = PC;
+            ADDR1MUX_PKG::SR1 : MARMUX1 = SR1_OUT;
+            ADDR1MUX_PKG::PC  : MARMUX1 = PC;
         endcase
 
         // MARMUX 2
         case (ADDR2MUX)
-            ADDR2MUX::ZERO  : MARMUX2 = 0;
-            ADDR2MUX::IR_5  : MARMUX2 = $signed(IR[5:0]); //TODO: Verify this works
-            ADDR2MUX::IR_8  : MARMUX2 = { {7{IR[8]}}, IR[8:0]}; //TODO: Verify this works
-            ADDR2MUX::IR_10 : MARMUX2 = $signed(IR[10:0]);
+            ADDR2MUX_PKG::ZERO  : MARMUX2 = 0;
+            ADDR2MUX_PKG::IR_5  : MARMUX2 = $signed(IR[5:0]); //TODO: Verify this works
+            ADDR2MUX_PKG::IR_8  : MARMUX2 = { {7{IR[8]}}, IR[8:0]}; //TODO: Verify this works
+            ADDR2MUX_PKG::IR_10 : MARMUX2 = $signed(IR[10:0]);
         endcase
 
         // SR1mux
         case (SR1MUX)
-            SR1MUX::IR_8_6  : SR1 = IR[8:6];
-            SR1MUX::IR_11_9 : SR1 = IR[11:9];
+            SR1MUX_PKG::IR_8_6  : SR1 = IR[8:6];
+            SR1MUX_PKG::IR_11_9 : SR1 = IR[11:9];
         endcase
 
         // SR2mux
         case (SR2MUX)
-            SR2MUX::SR2_OUT : SR2MUX_OUT = SR2_OUT;
-            SR2MUX::IR_SEXT : SR2MUX_OUT = $signed(IR[4:0]); // TODO: Verify this works
+            SR2MUX_PKG::SR2_OUT : SR2MUX_OUT = SR2_OUT;
+            SR2MUX_PKG::IR_SEXT : SR2MUX_OUT = $signed(IR[4:0]); // TODO: Verify this works
         endcase
 
         // DRmux
         case (DRMUX)
-            DRMUX::IR_11_9 : DR = IR[11:9];
-            DRMUX::ONES    : DR = '1;
+            DRMUX_PKG::IR_11_9 : DR = IR[11:9];
+            DRMUX_PKG::ONES    : DR = '1;
         endcase
 
     end

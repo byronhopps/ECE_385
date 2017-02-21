@@ -42,7 +42,7 @@ module ISDU (
         else 
             state <= nextState;
     end
-   
+
     always_comb begin 
         // Default next state is staying at current state
         nextState = state;
@@ -181,7 +181,7 @@ module ISDU (
             S_18 : begin 
                 GatePC = 1'b1;
                 LD_MAR = 1'b1;
-                PCMUX = PCMUX::PC_PLUS1;
+                PCMUX = PCMUX_PKG::PC_PLUS1;
                 LD_PC = 1'b1;
             end
 
@@ -208,14 +208,14 @@ module ISDU (
             // DR <= SR1 + OP2
             // Set CC
             S_01 : begin 
-                SR1MUX = SR1MUX::IR_8_6;
+                SR1MUX = SR1MUX_PKG::IR_8_6;
 
                 case(IR_5)
-                    1'b0 : SR2MUX = SR2MUX::SR2_OUT;
-                    1'b1 : SR2MUX = SR2MUX::IR_SEXT;
+                    1'b0 : SR2MUX = SR2MUX_PKG::SR2_OUT;
+                    1'b1 : SR2MUX = SR2MUX_PKG::IR_SEXT;
                 endcase
 
-                DRMUX  = DRMUX::IR_11_9;
+                DRMUX  = DRMUX_PKG::IR_11_9;
                 ALUK   = ALU_OPS::ADD;
                 GateALU = 1'b1;
                 LD_REG = 1'b1;
@@ -226,14 +226,14 @@ module ISDU (
             // DR <= SR1 & OP2
             // Set CC
             S_05 : begin
-                SR1MUX = SR1MUX::IR_8_6;
+                SR1MUX = SR1MUX_PKG::IR_8_6;
 
                 case(IR_5)
-                    1'b0 : SR2MUX = SR2MUX::SR2_OUT;
-                    1'b1 : SR2MUX = SR2MUX::IR_SEXT;
+                    1'b0 : SR2MUX = SR2MUX_PKG::SR2_OUT;
+                    1'b1 : SR2MUX = SR2MUX_PKG::IR_SEXT;
                 endcase
 
-                DRMUX  = DRMUX::IR_11_9;
+                DRMUX  = DRMUX_PKG::IR_11_9;
                 ALUK   = ALU_OPS::AND;
                 GateALU= 1'b1;
                 LD_REG = 1'b1;
@@ -244,8 +244,8 @@ module ISDU (
             // DR <= NOT(SR)
             // Set CC
             S_09 : begin
-                SR1MUX = SR1MUX::IR_8_6;
-                DRMUX  = DRMUX::IR_11_9;
+                SR1MUX = SR1MUX_PKG::IR_8_6;
+                DRMUX  = DRMUX_PKG::IR_11_9;
                 ALUK   = ALU_OPS::NOT;
                 GateALU= 1'b1;
                 LD_REG = 1'b1;
@@ -255,19 +255,19 @@ module ISDU (
             // State 22
             // PC <= PC + off9
             S_22 : begin
-                PCMUX = PCMUX::ADDR_SUM;
-                ADDR1MUX = ADDR1MUX::PC;
-                ADDR2MUX = ADDR2MUX::OFF9;
+                PCMUX = PCMUX_PKG::ADDR_SUM;
+                ADDR1MUX = ADDR1MUX_PKG::PC;
+                ADDR2MUX = ADDR2MUX_PKG::OFF9;
                 LD_PC = 1'b1;
             end
 
             // State 12
             // PC <= BaseR
             S_12 : begin
-                SR1MUX = SR1MUX::IR_8_6;
-                ADDR1MUX = ADDR1MUX::SR1;
-                ADDR2MUX = ADDR2MUX::ZERO;
-                PCMUX = PCMUX::ADDR_SUM;
+                SR1MUX = SR1MUX_PKG::IR_8_6;
+                ADDR1MUX = ADDR1MUX_PKG::SR1;
+                ADDR2MUX = ADDR2MUX_PKG::ZERO;
+                PCMUX = PCMUX_PKG::ADDR_SUM;
                 LD_PC = 1'b1;
             end
 
@@ -275,17 +275,17 @@ module ISDU (
             // R7 <- PC
             S_04 : begin
                 GatePC = 1'b1;
-                DRMUX  = DRMUX::SEVEN;
+                DRMUX  = DRMUX_PKG::SEVEN;
                 LD_REG = 1'b1;
             end
 
             // State 20
             // PC <- BaseR
             S_20 : begin
-                SR1MUX = SR1MUX::BASE_R;
-                ADDR1MUX = ADDR1MUX::SR1;
-                ADDR2MUX = ADDR2MUX::ZERO;
-                PCMUX = PCMUX::ADDR_SUM;
+                SR1MUX = SR1MUX_PKG::BASE_R;
+                ADDR1MUX = ADDR1MUX_PKG::SR1;
+                ADDR2MUX = ADDR2MUX_PKG::ZERO;
+                PCMUX = PCMUX_PKG::ADDR_SUM;
                 LD_PC = 1'b1;
             end
 
