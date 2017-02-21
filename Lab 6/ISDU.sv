@@ -15,6 +15,7 @@
 //    Spring 2017 Distribution
 //------------------------------------------------------------------------------
 
+//`include "globals.sv"
 
 module ISDU (
     input logic Clk, Reset, Run, Continue,
