@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Company: 		 UIUC ECE Dept.
-// Engineer:		 Stephen Kempf
+// Company:          UIUC ECE Dept.
+// Engineer:         Stephen Kempf
 //
 // Create Date:    Feb. 18, 2017
 // Design Name:    ECE 385 Lab 6 Given Code - SLC-3 top-level (External SRAM)
@@ -11,21 +11,21 @@
 //    Spring 2007 Distribution
 //    Revised 07-26-2013
 //    Spring 2015 Distribution
-//    Revised 09-22-2015 
-//    Revised 02-13-2017 
+//    Revised 09-22-2015
+//    Revised 02-13-2017
 //    Spring 2017 Distribution
 //
 //------------------------------------------------------------------------------
 
 // Temporary top-level module for week 1
 module slc3_toplevel(
-	input logic [15:0] S,
-	input logic	Clk, Reset, Run, Continue,
-	output logic [11:0] LED,
-	output logic [6:0] HEX0, HEX1, HEX2, HEX3
+    input logic [15:0] S,
+    input logic    Clk, Reset, Run, Continue,
+    output logic [11:0] LED,
+    output logic [6:0] HEX0, HEX1, HEX2, HEX3
 );
 
-	logic CE, UB, LB, OE, WE;
+    logic CE, UB, LB, OE, WE;
     wire [15:0] memoryIO;
     logic [19:0] ADDR;
 
@@ -37,20 +37,21 @@ module slc3_toplevel(
     test_memory memoryUnit(.Clk, .Reset, .CE, .UB, .LB, .OE, .WE,
         .I_O(memoryIO), .A(ADDR)
     );
+
 endmodule
 
 
 module slc3(
-	input logic [15:0] S,
-	input logic	Clk, Reset, Run, Continue,
-	output logic [11:0] LED,
-	output logic [6:0] HEX0, HEX1, HEX2, HEX3,
-	output logic CE, UB, LB, OE, WE,
-	output logic [19:0] ADDR,
-	inout wire [15:0] Data //tristate buffers need to be of type wire
+    input logic [15:0] S,
+    input logic    Clk, Reset, Run, Continue,
+    output logic [11:0] LED,
+    output logic [6:0] HEX0, HEX1, HEX2, HEX3,
+    output logic CE, UB, LB, OE, WE,
+    output logic [19:0] ADDR,
+    inout wire [15:0] Data //tristate buffers need to be of type wire
 );
 
-// Declaration of push button active high signals	
+// Declaration of push button active high signals
 logic Reset_ah, Continue_ah, Run_ah;
 
 assign Reset_ah = ~Reset;
@@ -86,8 +87,8 @@ logic [15:0] MAR, MDR, IR;
 logic [15:0] Data_from_SRAM, Data_to_SRAM;
 
 // Connect MAR to ADDR, which is also connected as an input into MEM2IO
-//	MEM2IO will determine what gets put onto Data_CPU (which serves as a potential
-//	input into MDR)
+//    MEM2IO will determine what gets put onto Data_CPU (which serves as a potential
+//    input into MDR)
 assign ADDR = { 4'b00, MAR }; //Note, our external SRAM chip is 1Mx16, but address space is only 64Kx16
 assign MIO_EN = ~OE;
 
@@ -97,24 +98,24 @@ datapath d0 (.*);
 
 // Our SRAM and I/O controller
 Mem2IO memory_subsystem(
-	.*, .Reset(Reset_ah), .ADDR(ADDR), .Switches(S),
-//	Uncomment the following line for Week 2 to patch Hex display into Mem2IO
-//	.HEX0(hex_4[0][3:0]), .HEX1(hex_4[1][3:0]), .HEX2(hex_4[2][3:0]), .HEX3(hex_4[3][3:0]),
+    .*, .Reset(Reset_ah), .ADDR(ADDR), .Switches(S),
+//    Uncomment the following line for Week 2 to patch Hex display into Mem2IO
+//    .HEX0(hex_4[0][3:0]), .HEX1(hex_4[1][3:0]), .HEX2(hex_4[2][3:0]), .HEX3(hex_4[3][3:0]),
     .HEX0(), .HEX1(), .HEX2(), .HEX3(),
-	.Data_from_CPU(MDR), .Data_to_CPU(MDR_In),
-	.Data_from_SRAM(Data_from_SRAM), .Data_to_SRAM(Data_to_SRAM)
+    .Data_from_CPU(MDR), .Data_to_CPU(MDR_In),
+    .Data_from_SRAM(Data_from_SRAM), .Data_to_SRAM(Data_to_SRAM)
 );
 
 // The tri-state buffer serves as the interface between Mem2IO and SRAM
 tristate #(.N(16)) tr0(
-	.Clk(Clk), .tristate_output_enable(~WE), .Data_write(Data_to_SRAM), .Data_read(Data_from_SRAM), .Data(Data)
+    .Clk(Clk), .tristate_output_enable(~WE), .Data_write(Data_to_SRAM), .Data_read(Data_from_SRAM), .Data(Data)
 );
 
 // State machine and control signals
 ISDU state_controller(
-	.*, .Reset(Reset_ah), .Run(Run_ah), .Continue(Continue_ah),
-	.Opcode(IR[15:12]), .IR_5(IR[5]), .IR_11(IR[11]),
-	.Mem_CE(CE), .Mem_UB(UB), .Mem_LB(LB), .Mem_OE(OE), .Mem_WE(WE)
+    .*, .Reset(Reset_ah), .Run(Run_ah), .Continue(Continue_ah),
+    .Opcode(IR[15:12]), .IR_5(IR[5]), .IR_11(IR[11]),
+    .Mem_CE(CE), .Mem_UB(UB), .Mem_LB(LB), .Mem_OE(OE), .Mem_WE(WE)
 );
 
 // An example of instantiating the test_memory. Do not instantiate it here.
@@ -123,9 +124,9 @@ ISDU state_controller(
 // Otherwise, the circuit will not function correctly.
 /*
 test_memory test_memory0(
-	.Clk(Clk), .Reset(~Reset),
-	.I_O(Data), .A(ADDR),
-	.*
+    .Clk(Clk), .Reset(~Reset),
+    .I_O(Data), .A(ADDR),
+    .*
 );
 */
 endmodule
