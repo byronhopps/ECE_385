@@ -1,9 +1,10 @@
 module datapath (
-    input logic Clk,
+    input logic Clk, Reset,
     input logic LD_MAR, LD_MDR, LD_IR, LD_BEN, LD_CC, LD_REG, LD_PC, LD_LED,
     input logic GatePC, GateMDR, GateALU, GateMARMUX,
     input logic [1:0] PCMUX, ADDR2MUX, ALUK,
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
+    input logic [15:0] MDR_In,
 
     output logic [15:0] MDR, MAR, IR,
     output logic [11:0] LED,
@@ -17,7 +18,6 @@ module datapath (
     // Define registers and register inputs
     logic [15:0] PC, PCnext;
     logic [15:0] MDRnext;
-    logic [15:0] MARnext;
     logic N, Z, P;
 
     // Define main data bus
@@ -53,20 +53,21 @@ module datapath (
     regFile register_file (.Clk, .mainBus, .DR, .SR1, .SR2(IR[2:0]), .LD_REG, .SR1_OUT, .SR2_OUT);
     ALU ALU_MAIN (.A(SR1_OUT), .B(SR2MUX_OUT), .ALUK, .OUT(ALU_OUT));
 
+    register_16 PCreg (.Clk, .Reset, .LD(LD_PC), .In(PCnext), .Out(PC));
+    register_16 IRreg (.Clk, .Reset, .LD(LD_IR), .In(mainBus), .Out(IR));
+    register_16 MDRreg (.Clk, .Reset, .LD(LD_MDR), .In(MDR_In), .Out(MDR));
+    register_16 MARreg (.Clk, .Reset, .LD(LD_MAR), .In(mainBus), .Out(MAR));
+
+    initial begin
+        PC = 0;
+        IR = 0;
+        MAR = '1;
+        LED = 0;
+        BEN = 0;
+    end
+
     // Update registers on clock edge when load is asserted
     always_ff @ (posedge Clk) begin
-
-        // Update value of PC from PCmux
-        if (LD_PC == 1)
-            PC <= PCnext;
-        else
-            PC <= PC;
-
-        // Update value of IR from main bus
-        if (LD_IR == 1)
-            IR <= mainBus;
-        else
-            IR <= IR;
 
         // Update value of CC
         if (LD_CC == 1) begin
@@ -76,18 +77,6 @@ module datapath (
             N = (mainBus < 0);
         end
         // Assuming that state is preserved
-
-        // Update value of MDR
-        if (LD_MDR == 1)
-            MDR <= MDRnext;
-        else
-            MDR <= MDR;
-
-        // Update value of MAR
-        if (LD_MAR == 1)
-            MAR <= MARnext;
-        else
-            MAR <= MAR;
 
         // Update value of BEN
         if (LD_BEN == 1)
