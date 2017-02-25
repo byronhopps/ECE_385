@@ -62,10 +62,8 @@ module ISDU (
             S_33_1 : nextState <= S_33_2;
             S_33_2 : nextState <= S_35;
 
-            S_35 : nextState <= PauseIR1;
+            S_35 : nextState <= S_18;
 
-            // PauseIR1 and PauseIR2 are only for Week 1 such that TAs can see 
-            // the values in IR. They should be removed in Week 2
             PauseIR1 : begin
                 if (~Continue) 
                     nextState <= PauseIR1;
@@ -127,7 +125,7 @@ module ISDU (
             S_20 : nextState <= S_18;
 
             // PSE instruction
-            S_13 : nextState <= S_18;
+            S_13 : nextState <= PauseIR1;
 
             // LDR instruction
             S_06   : nextState <= S_25_1;
