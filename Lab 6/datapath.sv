@@ -5,6 +5,7 @@ module datapath (
     input logic [1:0] PCMUX, ADDR2MUX, ALUK,
     input logic DRMUX, SR1MUX, SR2MUX, ADDR1MUX,
     input logic [15:0] MDR_In,
+	 input logic MIO_EN,
 
     output logic [15:0] MDR, MAR, IR,
     output logic [11:0] LED,
@@ -55,7 +56,7 @@ module datapath (
 
     register_16 PCreg (.Clk, .Reset, .LD(LD_PC), .In(PCnext), .Out(PC));
     register_16 IRreg (.Clk, .Reset, .LD(LD_IR), .In(mainBus), .Out(IR));
-    register_16 MDRreg (.Clk, .Reset, .LD(LD_MDR), .In(MDR_In), .Out(MDR));
+    register_16 MDRreg (.Clk, .Reset, .LD(LD_MDR), .In(MDRnext), .Out(MDR));
     register_16 MARreg (.Clk, .Reset, .LD(LD_MAR), .In(mainBus), .Out(MAR));
 
     initial begin
@@ -148,6 +149,11 @@ module datapath (
             DRMUX_PKG::ONES    : DR = '1;
         endcase
 
+        // MDRmux
+        case (MIO_EN)
+            MDRMUX_PKG::MAINBUS : MDRnext = mainBus;
+            MDRMUX_PKG::MEMORY  : MDRnext = MDR_In;
+        endcase
     end
 
 endmodule

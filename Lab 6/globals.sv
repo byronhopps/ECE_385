@@ -37,6 +37,11 @@ package DRMUX_PKG;
     parameter SEVEN   = 1'b1;
 endpackage
 
+package MDRMUX_PKG;
+    parameter MAINBUS = 1'b0;
+    parameter MEMORY  = 1'b1;
+endpackage
+
 package ALU_OPS;
     parameter ADD = 2'b00;
     parameter AND = 2'b01;
