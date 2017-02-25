@@ -100,6 +100,7 @@ module datapath (
             4'b0100 : mainBus = MDR;
             4'b0010 : mainBus = ALU_OUT;
             4'b0001 : mainBus = MARMUX;
+            4'b0000 : mainBus = '0;
             default : begin
                 mainBus = '0;
                 $error("Unspecified output on main bus");
