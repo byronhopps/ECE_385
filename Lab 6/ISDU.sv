@@ -62,7 +62,7 @@ module ISDU (
             S_33_1 : nextState <= S_33_2;
             S_33_2 : nextState <= S_35;
 
-            S_35 : nextState <= S_18;
+            S_35 : nextState <= S_32;
 
             PauseIR1 : begin
                 if (~Continue) 
