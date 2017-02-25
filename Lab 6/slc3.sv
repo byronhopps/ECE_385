@@ -51,10 +51,10 @@ logic [15:0] Data_from_SRAM, Data_to_SRAM;
 // For Week 2, they will be patched into the MEM2IO module so that Memory-mapped IO can take place
 logic [3:0][3:0] hex_4;
 
-HexDriver hexDriver0 (.IN(hex0), .OUT(HEX0));
-HexDriver hexDriver1 (.IN(hex1), .OUT(HEX1));
-HexDriver hexDriver2 (.IN(hex2), .OUT(HEX2));
-HexDriver hexDriver3 (.IN(hex3), .OUT(HEX3));
+HexDriver hexDriver0 (.IN(hex_4[0]), .OUT(HEX0));
+HexDriver hexDriver1 (.IN(hex_4[1]), .OUT(HEX1));
+HexDriver hexDriver2 (.IN(hex_4[2]), .OUT(HEX2));
+HexDriver hexDriver3 (.IN(hex_4[3]), .OUT(HEX3));
 
 // Connect MAR to ADDR, which is also connected as an input into MEM2IO
 //    MEM2IO will determine what gets put onto Data_CPU (which serves as a potential

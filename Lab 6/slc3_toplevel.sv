@@ -12,7 +12,7 @@ module slc3_toplevel(
     logic [19:0] ADDR;
 
     slc3 mainComputer (.Clk, .Reset, .Run, .Continue,
-        .LED, .HEX0, .HEX1, .HEX2, .HEX3, .ADDR, .CE, .UB, .LB, .OE, .WE,
+        .S, .LED, .HEX0, .HEX1, .HEX2, .HEX3, .ADDR, .CE, .UB, .LB, .OE, .WE,
         .Data(memoryIO)
     );
 
