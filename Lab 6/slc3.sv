@@ -17,7 +17,6 @@
 //
 //------------------------------------------------------------------------------
 
-
 module slc3(
     input logic [15:0] S,
     input logic    Clk, Reset, Run, Continue,
@@ -51,17 +50,11 @@ logic [15:0] Data_from_SRAM, Data_to_SRAM;
 // For Week 1, they will directly be connected to the IR register
 // For Week 2, they will be patched into the MEM2IO module so that Memory-mapped IO can take place
 logic [3:0][3:0] hex_4;
-// Remove the following assignments for Week 2
-assign hex_4[3][3:0] = IR[15:12];
-assign hex_4[2][3:0] = IR[11:8];
-assign hex_4[1][3:0] = IR[7:4];
-assign hex_4[0][3:0] = IR[3:0];
 
-// For week 1 only
-HexDriver hex_driver3 (.IN(IR[15:12]), .OUT(HEX3));
-HexDriver hex_driver2 (.IN(IR[11:8]), .OUT(HEX2));
-HexDriver hex_driver1 (.IN(IR[7:4]), .OUT(HEX1));
-HexDriver hex_driver0 (.IN(IR[3:0]), .OUT(HEX0));
+HexDriver hexDriver0 (.IN(hex_4[0]), .OUT(HEX0));
+HexDriver hexDriver1 (.IN(hex_4[1]), .OUT(HEX1));
+HexDriver hexDriver2 (.IN(hex_4[2]), .OUT(HEX2));
+HexDriver hexDriver3 (.IN(hex_4[3]), .OUT(HEX3));
 
 // Connect MAR to ADDR, which is also connected as an input into MEM2IO
 //    MEM2IO will determine what gets put onto Data_CPU (which serves as a potential
@@ -76,9 +69,7 @@ datapath d0 (.*, .Reset(Reset_ah));
 // Our SRAM and I/O controller
 Mem2IO memory_subsystem(
     .*, .Reset(Reset_ah), .ADDR(ADDR), .Switches(S),
-//    Uncomment the following line for Week 2 to patch Hex display into Mem2IO
-//    .HEX0(hex_4[0][3:0]), .HEX1(hex_4[1][3:0]), .HEX2(hex_4[2][3:0]), .HEX3(hex_4[3][3:0]),
-    .HEX0(), .HEX1(), .HEX2(), .HEX3(),
+    .HEX0(hex_4[0][3:0]), .HEX1(hex_4[1][3:0]), .HEX2(hex_4[2][3:0]), .HEX3(hex_4[3][3:0]),
     .Data_from_CPU(MDR), .Data_to_CPU(MDR_In),
     .Data_from_SRAM(Data_from_SRAM), .Data_to_SRAM(Data_to_SRAM)
 );
