@@ -40,6 +40,7 @@ package ALU_OPS;
     parameter ADD = 2'b00;
     parameter AND = 2'b01;
     parameter NOT = 2'b10;
+    parameter PSA = 2'b11;
 endpackage
 
 package OPCODE;
