@@ -13,6 +13,7 @@ endpackage
 package ADDR2MUX_PKG;
     parameter ZERO  = 2'b00;
     parameter IR_5  = 2'b01;
+    parameter OFF6  = 2'b01;
     parameter IR_8  = 2'b10;
     parameter OFF9  = 2'b10;
     parameter IR_10 = 2'b11;
