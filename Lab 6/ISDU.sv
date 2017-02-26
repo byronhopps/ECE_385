@@ -32,7 +32,7 @@ module ISDU (
    // Internal state logic
     enum logic [5:0] { Halted, PauseIR1, PauseIR2,
         S_00, S_04, S_06, S_07, S_16_1, S_16_2, S_12,
-        S_13, S_18, S_20, S_22, S_23, S_25_1, S_25_2, S_27, S_33_1,
+        S_13, S_18, S_21, S_22, S_23, S_25_1, S_25_2, S_27, S_33_1,
         S_33_2, S_35, S_32, S_01, S_05, S_09}   state, nextState;
 
     always_ff @ (posedge Clk)
@@ -121,8 +121,8 @@ module ISDU (
             S_12 : nextState <= S_18;
 
             // JSR instruction
-            S_04 : nextState <= S_20;
-            S_20 : nextState <= S_18;
+            S_04 : nextState <= S_21;
+            S_21 : nextState <= S_18;
 
             // PSE instruction
             S_13 : nextState <= PauseIR1;
@@ -291,12 +291,11 @@ module ISDU (
                 LD_REG = 1'b1;
             end
 
-            // State 20
-            // PC <- BaseR
-            S_20 : begin
-                SR1MUX = SR1MUX_PKG::BASE_R;
-                ADDR1MUX = ADDR1MUX_PKG::SR1;
-                ADDR2MUX = ADDR2MUX_PKG::ZERO;
+            // State 21
+            // PC <- PC + off11
+            S_21 : begin
+                ADDR1MUX = ADDR1MUX_PKG::PC;
+                ADDR2MUX = ADDR2MUX_PKG::OFF11;
                 PCMUX = PCMUX_PKG::ADDR_SUM;
                 LD_PC = 1'b1;
             end
