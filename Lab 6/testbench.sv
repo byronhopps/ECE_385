@@ -25,7 +25,7 @@ end
 
 // Tests start here
 initial begin : TEST_VECTORS
-    S = 16'd3;
+    S = 16'd11;
     Run = 1;
 //  Continue = 1;
 #4  Reset = 1;
