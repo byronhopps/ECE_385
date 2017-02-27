@@ -49,13 +49,13 @@ module test_memory ( input          Clk,
    begin
       I_O_wire = 16'bZZZZZZZZZZZZZZZZ;
 
-      if (~CE && ~OE && WE) begin
+    if (~CE && ~OE && WE) begin
          if (~UB)
             I_O_wire[15:8] = mem_out[15:8];
 				
          if (~LB)
             I_O_wire[7:0] = mem_out[7:0];
-		end
+    end
    end
 	  
    always_ff @ (posedge Clk or posedge Reset)
@@ -230,19 +230,19 @@ mem_array[ 154 ] <=    opRET                    ;       // DISPLAY FUNCTION RETU
 mem_array[ 155 ] <=    opPSE(12'h802)           ;       //    instruction as data
 
 			
-			for (integer i = 156; i <= size - 1; i = i + 1)		// Assign the rest of the memory to 0
-			begin
-				mem_array[i] <= 16'h0;
-			end
+                    for (integer i = 156; i <= size - 1; i = i + 1)		// Assign the rest of the memory to 0
+                        begin
+                            mem_array[i] <= 16'h0;
+                        end
 		end
-		else if (~CE && ~WE && A[15:8]==8'b00000000)
-		begin
-          if(~UB)
-			    mem_array[A[7:0]][15:8] <= I_O[15:8];   // A(15 downto X+1): X must
-																	  // be the same as above
-		    if(~LB)
-			    mem_array[A[7:0]][7:0] <= I_O[7:0];     // A(X downto 0): X
-		end                                            // must be the same as above
+
+            else if (~CE && ~WE && A[15:8]==8'b00000000) begin
+                if(~UB)
+                        mem_array[A[7:0]][15:8] <= I_O[15:8];   // A(15 downto X+1): X must
+                                                                // be the same as above
+                if(~LB)
+                        mem_array[A[7:0]][7:0] <= I_O[7:0];     // A(X downto 0): X
+            end                                                 // must be the same as above
 
    end
 	  
