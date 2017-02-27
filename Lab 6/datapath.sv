@@ -72,12 +72,10 @@ module datapath (
 
         // Update value of CC
         if (LD_CC == 1) begin
-            // TODO: Verify this works
-            P = (mainBus > 0);
-            Z = (mainBus == 0);
-            N = (mainBus < 0);
+            P = (signed'(mainBus) > 0);
+            Z = (signed'(mainBus) == 0);
+            N = (signed'(mainBus) < 0);
         end
-        // Assuming that state is preserved
 
         // Update value of BEN
         if (LD_BEN == 1)
