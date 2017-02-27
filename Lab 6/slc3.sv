@@ -30,9 +30,11 @@ module slc3(
 // Declaration of push button active high signals
 logic Reset_ah, Continue_ah, Run_ah;
 
-assign Reset_ah = ~Reset;
-assign Continue_ah = ~Continue;
-assign Run_ah = ~Run;
+// Add synchronizers on button inputs
+// The inputs are inverted to get active high outputs
+sync rstSync(.Clk, .d(~Reset), .q(Reset_ah));
+sync conSync(.Clk, .d(~Continue), .q(Continue_ah));
+sync runSync(.Clk, .d(~Run), .q(Run_ah));
 
 // Internal connections
 logic BEN;
