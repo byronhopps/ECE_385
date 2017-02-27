@@ -29,7 +29,7 @@ module datapath (
     assign MARMUX = MARMUX1 + MARMUX2;
 
     // Define SR1, SR2, and DR mux outputs
-    logic [3:0] DR;
+    logic [2:0] DR;
     logic [2:0] SR1;
     logic [15:0] SR2MUX_OUT;
 
@@ -51,7 +51,7 @@ module datapath (
     // Modules
     // -------
 
-    regFile register_file (.Clk, .mainBus, .DR, .SR1, .SR2(IR[2:0]), .LD_REG, .SR1_OUT, .SR2_OUT);
+    regFile register_file (.Clk, .Reset, .mainBus, .DR, .SR1, .SR2(IR[2:0]), .LD_REG, .SR1_OUT, .SR2_OUT);
     ALU ALU_MAIN (.A(SR1_OUT), .B(SR2MUX_OUT), .ALUK, .OUT(ALU_OUT));
 
     register_16 PCreg (.Clk, .Reset, .LD(LD_PC), .In(PCnext), .Out(PC));
