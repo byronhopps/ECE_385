@@ -10,9 +10,6 @@ output_files/
 simulation/
 db/
 
-# Eclipse metadata
-.metadata
-
 # Vim swap files
 *.swp
 
