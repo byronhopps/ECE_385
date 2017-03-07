@@ -2,9 +2,9 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Mar 6, 2017 6:41:48 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1488847308240</BspGeneratedUnixTimeStamp>
-        <BspGeneratedLocation>C:\Users\zhend\Desktop\Yr3S2\ECE_385\ECE_385_git\Lab_7\software\lab7_app_bsp</BspGeneratedLocation>
+        <BspGeneratedTimeStamp>Mar 6, 2017 11:19:20 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1488863960397</BspGeneratedUnixTimeStamp>
+        <BspGeneratedLocation>G:\ECE_385\Lab_7\software\lab7_app_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\lab7_soc.sopcinfo</SopcDesignFile>
         <JdiFile>default</JdiFile>
@@ -883,6 +883,18 @@
         <MemoryMap>
                 <slaveDescriptor>LED</slaveDescriptor>
                 <addressRange>0x00000050 - 0x0000005F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>SWITCH_IN</slaveDescriptor>
+                <addressRange>0x00000060 - 0x0000006F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>BUTTON_IN</slaveDescriptor>
+                <addressRange>0x00000070 - 0x0000007F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>

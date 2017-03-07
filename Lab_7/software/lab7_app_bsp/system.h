@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'lab7_soc'
  * SOPC Builder design path: ../../lab7_soc.sopcinfo
  *
- * Generated: Mon Mar 06 18:35:05 CST 2017
+ * Generated: Mon Mar 06 22:46:22 CST 2017
  */
 
 /*
@@ -53,6 +53,33 @@
 
 /* Include definitions from linker script generator */
 #include "linker.h"
+
+
+/*
+ * BUTTON_IN configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_BUTTON_IN altera_avalon_pio
+#define BUTTON_IN_BASE 0x70
+#define BUTTON_IN_BIT_CLEARING_EDGE_REGISTER 0
+#define BUTTON_IN_BIT_MODIFYING_OUTPUT_REGISTER 0
+#define BUTTON_IN_CAPTURE 0
+#define BUTTON_IN_DATA_WIDTH 4
+#define BUTTON_IN_DO_TEST_BENCH_WIRING 0
+#define BUTTON_IN_DRIVEN_SIM_VALUE 0
+#define BUTTON_IN_EDGE_TYPE "NONE"
+#define BUTTON_IN_FREQ 50000000
+#define BUTTON_IN_HAS_IN 1
+#define BUTTON_IN_HAS_OUT 0
+#define BUTTON_IN_HAS_TRI 0
+#define BUTTON_IN_IRQ -1
+#define BUTTON_IN_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define BUTTON_IN_IRQ_TYPE "NONE"
+#define BUTTON_IN_NAME "/dev/BUTTON_IN"
+#define BUTTON_IN_RESET_VALUE 0
+#define BUTTON_IN_SPAN 16
+#define BUTTON_IN_TYPE "altera_avalon_pio"
 
 
 /*
@@ -166,6 +193,33 @@
 #define LED_RESET_VALUE 0
 #define LED_SPAN 16
 #define LED_TYPE "altera_avalon_pio"
+
+
+/*
+ * SWITCH_IN configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_SWITCH_IN altera_avalon_pio
+#define SWITCH_IN_BASE 0x60
+#define SWITCH_IN_BIT_CLEARING_EDGE_REGISTER 0
+#define SWITCH_IN_BIT_MODIFYING_OUTPUT_REGISTER 0
+#define SWITCH_IN_CAPTURE 0
+#define SWITCH_IN_DATA_WIDTH 8
+#define SWITCH_IN_DO_TEST_BENCH_WIRING 0
+#define SWITCH_IN_DRIVEN_SIM_VALUE 0
+#define SWITCH_IN_EDGE_TYPE "NONE"
+#define SWITCH_IN_FREQ 50000000
+#define SWITCH_IN_HAS_IN 1
+#define SWITCH_IN_HAS_OUT 0
+#define SWITCH_IN_HAS_TRI 0
+#define SWITCH_IN_IRQ -1
+#define SWITCH_IN_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define SWITCH_IN_IRQ_TYPE "NONE"
+#define SWITCH_IN_NAME "/dev/SWITCH_IN"
+#define SWITCH_IN_RESET_VALUE 0
+#define SWITCH_IN_SPAN 16
+#define SWITCH_IN_TYPE "altera_avalon_pio"
 
 
 /*
@@ -297,12 +351,12 @@
 
 #define ALT_MODULE_CLASS_sysid_qsys_0 altera_avalon_sysid_qsys
 #define SYSID_QSYS_0_BASE 0x48
-#define SYSID_QSYS_0_ID 0
+#define SYSID_QSYS_0_ID -87367986
 #define SYSID_QSYS_0_IRQ -1
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1488846838
+#define SYSID_QSYS_0_TIMESTAMP 1488860905
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 #endif /* __SYSTEM_H_ */

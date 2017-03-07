@@ -4,19 +4,41 @@
 
 int main()
 {
-    int i = 0;
-    volatile unsigned int *LED_PIO = (unsigned int*)0x50; //make a pointer to access the PIO block
+    // Declare pointers to PIO blocks
+    volatile unsigned int *LED_PIO = (unsigned int*) 0x50;
+    volatile unsigned int *SW_PIO  = (unsigned int*) 0x60;
+    volatile unsigned int *BTN_PIO = (unsigned int*) 0x70;
 
-    *LED_PIO = 0; //clear all LEDs
-    while (1 == 1) //infinite loop
-    {
-        for (i = 0; i < 100000; i++); //software delay
+    // Clear LEDs
+    *LED_PIO = 0;
 
-        *LED_PIO |= 0x1; //set LSB
+    // Declare variables
+    unsigned int buttons = 0;
+    unsigned int accPrev = 0;
+    unsigned int rst = 0;
+    unsigned int acc = 0;
 
-        for (i = 0; i < 100000; i++); //software delay
+    while (0xECE) {
 
-        *LED_PIO &= ~0x1; //clear LSB
+        // Set previous value of acc
+        accPrev = acc;
+
+        // Read buttons and update variables
+        buttons = *BTN_PIO;
+        rst = !((buttons & 0x4) >> 2);
+        acc = !((buttons & 0x8) >> 3);
+
+        // Check if the reset button is pressed
+        if (rst == 1) {
+            *LED_PIO = 0;
+            continue;
+        }
+
+        // Increment green LEDs if the accumulate button was just released 
+        if (acc == 0 && accPrev == 1) {
+            *LED_PIO += *SW_PIO;
+        }
     }
-    return 1; //never gets here
+
+    return 1;
 }
