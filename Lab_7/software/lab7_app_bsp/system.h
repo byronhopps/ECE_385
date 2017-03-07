@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'lab7_soc'
  * SOPC Builder design path: ../../lab7_soc.sopcinfo
  *
- * Generated: Sun Mar 05 18:44:41 CST 2017
+ * Generated: Mon Mar 06 18:35:05 CST 2017
  */
 
 /*
@@ -147,7 +147,7 @@
  */
 
 #define ALT_MODULE_CLASS_LED altera_avalon_pio
-#define LED_BASE 0x20
+#define LED_BASE 0x50
 #define LED_BIT_CLEARING_EDGE_REGISTER 0
 #define LED_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define LED_CAPTURE 0
@@ -255,12 +255,12 @@
 #define SDRAM_POWERUP_DELAY 200.0
 #define SDRAM_REFRESH_PERIOD 7.8125
 #define SDRAM_REGISTER_DATA_IN 1
-#define SDRAM_SDRAM_ADDR_WIDTH 0x1a
+#define SDRAM_SDRAM_ADDR_WIDTH 0x19
 #define SDRAM_SDRAM_BANK_WIDTH 2
 #define SDRAM_SDRAM_COL_WIDTH 10
-#define SDRAM_SDRAM_DATA_WIDTH 16
+#define SDRAM_SDRAM_DATA_WIDTH 32
 #define SDRAM_SDRAM_NUM_BANKS 4
-#define SDRAM_SDRAM_NUM_CHIPSELECTS 2
+#define SDRAM_SDRAM_NUM_CHIPSELECTS 1
 #define SDRAM_SDRAM_ROW_WIDTH 13
 #define SDRAM_SHARED_DATA 0
 #define SDRAM_SIM_MODEL_BASE 0
@@ -302,7 +302,7 @@
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1488760855
+#define SYSID_QSYS_0_TIMESTAMP 1488846838
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 #endif /* __SYSTEM_H_ */

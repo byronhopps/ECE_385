@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="lab7_soc" kind="lab7_soc" version="1.0" fabric="QSYS">
  <!-- Format version 15.0 145 (Future versions may contain additional information.) -->
- <!-- 2017.03.05.18:40:55 -->
+ <!-- 2017.03.06.18:33:58 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1488760855</value>
+  <value>1488846838</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -2796,7 +2796,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="dataSlaveMapParam">
    <type>java.lang.String</type>
-   <value><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='LED.s1' start='0x20' end='0x30' /><slave name='sdram_pll.pll_slave' start='0x30' end='0x40' /><slave name='sysid_qsys_0.control_slave' start='0x48' end='0x50' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></value>
+   <value><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='sdram_pll.pll_slave' start='0x30' end='0x40' /><slave name='sysid_qsys_0.control_slave' start='0x48' end='0x50' /><slave name='LED.s1' start='0x50' end='0x60' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -3499,7 +3499,7 @@ parameters are a RESULT of the module parameters. -->
     <moduleName>LED</moduleName>
     <slaveName>s1</slaveName>
     <name>LED.s1</name>
-    <baseAddress>32</baseAddress>
+    <baseAddress>80</baseAddress>
     <span>16</span>
    </memoryBlock>
    <memoryBlock>
@@ -5301,7 +5301,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_ADDR_WIDTH</name>
-   <value>26</value>
+   <value>25</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_BANK_WIDTH</name>
@@ -5313,7 +5313,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_DATA_WIDTH</name>
-   <value>16</value>
+   <value>32</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_NUM_BANKS</name>
@@ -5321,7 +5321,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_NUM_CHIPSELECTS</name>
-   <value>2</value>
+   <value>1</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SDRAM_ROW_WIDTH</name>
@@ -5377,7 +5377,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.memoryInfo.MEM_INIT_DATA_WIDTH</name>
-   <value>16</value>
+   <value>32</value>
   </assignment>
   <parameter name="TAC">
    <type>double</type>
@@ -5437,7 +5437,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="dataWidth">
    <type>int</type>
-   <value>16</value>
+   <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -5477,7 +5477,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="numberOfChipSelects">
    <type>int</type>
-   <value>2</value>
+   <value>1</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -5576,7 +5576,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="addressWidth">
    <type>int</type>
-   <value>26</value>
+   <value>25</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -6049,13 +6049,13 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>az_addr</name>
     <direction>Input</direction>
-    <width>26</width>
+    <width>25</width>
     <role>address</role>
    </port>
    <port>
     <name>az_be_n</name>
     <direction>Input</direction>
-    <width>2</width>
+    <width>4</width>
     <role>byteenable_n</role>
    </port>
    <port>
@@ -6067,7 +6067,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>az_data</name>
     <direction>Input</direction>
-    <width>16</width>
+    <width>32</width>
     <role>writedata</role>
    </port>
    <port>
@@ -6085,7 +6085,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>za_data</name>
     <direction>Output</direction>
-    <width>16</width>
+    <width>32</width>
     <role>readdata</role>
    </port>
    <port>
@@ -6166,19 +6166,19 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>zs_cs_n</name>
     <direction>Output</direction>
-    <width>2</width>
+    <width>1</width>
     <role>export</role>
    </port>
    <port>
     <name>zs_dq</name>
     <direction>Bidir</direction>
-    <width>16</width>
+    <width>32</width>
     <role>export</role>
    </port>
    <port>
     <name>zs_dqm</name>
     <direction>Output</direction>
-    <width>2</width>
+    <width>4</width>
     <role>export</role>
    </port>
    <port>
@@ -8302,7 +8302,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMESTAMP</name>
-   <value>1488760855</value>
+   <value>1488846838</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.compatible</name>
@@ -8322,7 +8322,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.timestamp</name>
-   <value>1488760855</value>
+   <value>1488846838</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -8338,7 +8338,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="timestamp">
    <type>int</type>
-   <value>1488760855</value>
+   <value>1488846838</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -9029,7 +9029,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <parameter name="baseAddress">
    <type>java.math.BigInteger</type>
-   <value>0x0020</value>
+   <value>0x0050</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -9560,33 +9560,6 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>inclk_interface_reset</endConnectionPoint>
  </connection>
  <connection
-   name="clk_0.clk_reset/nios2_gen2_0.reset"
-   kind="reset"
-   version="15.0"
-   start="clk_0.clk_reset"
-   end="nios2_gen2_0.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>clk_0</startModule>
-  <startConnectionPoint>clk_reset</startConnectionPoint>
-  <endModule>nios2_gen2_0</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
    name="clk_0.clk_reset/LED.reset"
    kind="reset"
    version="15.0"
@@ -9665,6 +9638,33 @@ parameters are a RESULT of the module parameters. -->
   <startModule>clk_0</startModule>
   <startConnectionPoint>clk_reset</startConnectionPoint>
   <endModule>sysid_qsys_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="clk_0.clk_reset/nios2_gen2_0.reset"
+   kind="reset"
+   version="15.0"
+   start="clk_0.clk_reset"
+   end="nios2_gen2_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>clk_0</startModule>
+  <startConnectionPoint>clk_reset</startConnectionPoint>
+  <endModule>nios2_gen2_0</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
