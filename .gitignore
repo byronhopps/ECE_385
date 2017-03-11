@@ -1,14 +1,38 @@
-# Miscellaneous data files
+# Quartus generated data files
 *.bak
 *.rpt
 *.qdf
 *.qws
+*.chg
+*.log
+*.htm
+*.eqn
+*.pin
+*.sof
+*.pof
+*.summary
+*.done
+*.smsg
+*.qws
+*.jdi
+*.db
+
+# Executable files
+*.elf
+*.exe
 
 # Ignore compilation and simulation directories
 incremental_db/
 output_files/
 simulation/
 db/
+
+# Qsys local configuration
+.qsys_edit
+
+# Eclipse files
+.metadata/
+RemoteSystemTempFiles
 
 # Vim swap files
 *.swp

@@ -1,0 +1,8 @@
+drivers/
+HAL/
+obj/
+alt_sys_init.c
+linker.h
+linker.x
+memory.gdb
+system.h
