@@ -1,3 +1,5 @@
+#include "aes.h"
+
 void encryptAES(unsigned char plaintext[17], unsigned char key[17], unsigned char cipherText[17])
 {
 
@@ -16,7 +18,7 @@ void encryptAES(unsigned char plaintext[17], unsigned char key[17], unsigned cha
         subBytes(state);
         shiftRows(state);
         mixColumns(state);
-        addRoundKey(state, roundKeys[i+1]);
+        addRoundKey(state, roundKeys[round+1]);
     }
 
     subBytes(state);
@@ -63,9 +65,25 @@ void shiftRows(unsigned char state[4][4])
     return;
 }
 
-// TODO: implement this
 void mixColumns(unsigned char state[4][4])
 {
+    // Variable to save the state of the current column
+    unsigned char tempCol;
+
+    for (int col = 0; col < 4; col++) {
+
+        // Save the state of the current column
+        for (int row = 0; row < 4; row++)
+            tempCol[row] = state[row][col];
+
+        // Write the new values to the current column
+        state[0][col] = gf_mul[tempCol[0]][0] ^ gf_mul[tempCol[1]][1] ^ tempCol[2] ^ tempCol[3];
+        state[1][col] = tempCol[0] ^ gf_mul[tempCol[1]][0] ^ gf_mul[tempCol[2]][1] ^ tempCol[3];
+        state[2][col] = tempCol[0] ^ tempCol[1] ^ gf_mul[tempCol[2]][0] ^ gf_mul[tempCol[3]][1];
+        state[3][col] = gf_mul[tempCol[0]][1] ^ tempCol[1] ^ tempCol[2] ^ gf_mul[tempCol[3]][0];
+    }
+
+    return;
 }
 
 void addRoundKey(unsigned char state[4][4], unsigned char[4][4] key)

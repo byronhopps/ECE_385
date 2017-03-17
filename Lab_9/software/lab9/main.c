@@ -56,9 +56,6 @@ int main()
         }
         putchar('\n');
 
-        // Skip rest of code for week 1
-        continue;
-
         // Transmit encrypted message to hardware side for decryption.
         printf("\nTransmitting message...\n");
 
@@ -78,6 +75,9 @@ int main()
         //TODO: Transmit key
 
         printf("\n\n");
+
+        // Skip rest of code for week 1
+        continue;
 
         while (*to_sw_sig != 2);
 
