@@ -1,0 +1,9 @@
+# Ignore everything
+/*
+
+# Except for these files, since everything else is machine generated
+!.gitignore
+!.cproject
+!.project
+!settings.bsp
+!.settings/language.settings.xml
