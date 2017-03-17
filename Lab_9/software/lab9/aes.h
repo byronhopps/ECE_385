@@ -203,8 +203,8 @@ void mixColumns(unsigned char state[4][4]);
 void addRoundKey(unsigned char state[4][4], unsigned char[4][4] key);
 
 // Key expansion stuff
-void keyExpansion(unsigned char key[17], unsigned char roundKeys[12][4][4]);
-void subWord(unsigned char word[4], unsigned char result[4]);
+void keyExpansion(unsigned char key[17], unsigned char roundKeys[11][4][4]);
+void subWord(unsigned char word[4]);
 void rotWord(unsigned char word[4]);
 
 // Transpose the input into the 4x4 output matrix in column-major ordering

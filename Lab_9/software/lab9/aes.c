@@ -2,7 +2,7 @@ void encryptAES(unsigned char plaintext[17], unsigned char key[17], unsigned cha
 {
 
     // Calculate round keys
-    unsigned char roundKeys[12][4][4];
+    unsigned char roundKeys[11][4][4];
     keyExpansion(key, roundKeys);
 
     // Transpose inputs into column-major state matrix
@@ -21,19 +21,46 @@ void encryptAES(unsigned char plaintext[17], unsigned char key[17], unsigned cha
 
     subBytes(state);
     shiftRows(state);
-    addRoundKey(state, roundKeys[11]);
+    addRoundKey(state, roundKeys[10]);
 
     return;
 }
 
-// TODO: implement this
 void subBytes(unsigned char state[4][4])
 {
+    // Substitute the values in each state element
+    for (int row = 1; row < 4; row++) {
+        for (int col = 0; col < 4; col++) {
+
+            // state[row][col] = {8'upperNibble, 8'lowerNibble}
+            unsigned char upperNibble = (state[row][col] >> 8) & 0x00FF;
+            unsigned char lowerNibble = (state[row][col] >> 0) & 0x00FF;
+
+            state[row][col] = aes_sbox[upperNibble][lowerNibble];
+        }
+    }
+
+    return;
 }
 
-// TODO: implement this
 void shiftRows(unsigned char state[4][4])
 {
+    // Temporary register to keep the function atomic
+    unsigned char tempRow[4];
+
+    // Start at the second row, since the first row doesn't change
+    for (int row = 1; row < 4; row++) {
+
+        // Copy current row into temporary register
+        for (int col = 0; col < 4; col++)
+            tempRow[col] = state[row][col];
+
+        // Overwrite the current state with the shifted values
+        for (int col = 0; col < 4; col++)
+            state[row][col] = tempRow[(col+row) % 4];
+    }
+
+    return;
 }
 
 // TODO: implement this
@@ -50,7 +77,7 @@ void addRoundKey(unsigned char state[4][4], unsigned char[4][4] key)
     return;
 }
 
-void keyExpansion(unsigned char key[17], unsigned char roundKeys[12][4][4])
+void keyExpansion(unsigned char key[17], unsigned char roundKeys[11][4][4])
 {
     // nk = 4
     unsigned char temp[4];
@@ -61,7 +88,7 @@ void keyExpansion(unsigned char key[17], unsigned char roundKeys[12][4][4])
             roundKeys[0][row][col] = key[row + 4*col];
 
     // For the rest of the keys, XOR the
-    for (int i = 1; i < 12; i++) {
+    for (int i = 1; i < 11; i++) {
         for (int col = 0; col < 4; col++) {
 
             // Assign temp as the previous word
@@ -74,7 +101,9 @@ void keyExpansion(unsigned char key[17], unsigned char roundKeys[12][4][4])
 
             if (col == 0) {
                 subWord(rotWord(temp));
-                temp ^= Rcon[i-1];
+
+                // Only need to XOR the first byte of the word
+                temp[0] ^= (Rcon[i-1]) >> 24;
             }
 
             // Current word of key is temp XOR with current word of previous key
@@ -87,8 +116,19 @@ void keyExpansion(unsigned char key[17], unsigned char roundKeys[12][4][4])
     return;
 }
 
-void subWord(unsigned char word[4], unsigned char result[4])
+void subWord(unsigned char word[4])
 {
+    // Substitute for each element in the word
+    for (int i = 0; i < 4; i++) {
+
+        // word[i] = {8'upperNibble, 8'lowerNibble}
+        unsigned char upperNibble = (word[i] >> 8) & 0x00FF;
+        unsigned char lowerNibble = (word[i] >> 0) & 0x00FF;
+
+        word[i] = aes_sbox[upperNibble][lowerNibble];
+    }
+
+    return;
 }
 
 void rotWord(unsigned char word[4])
