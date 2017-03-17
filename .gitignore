@@ -16,6 +16,7 @@
 *.qws
 *.jdi
 *.db
+*.sopcinfo
 
 # Executable files
 *.elf
@@ -33,6 +34,7 @@ db/
 # Eclipse files
 .metadata/
 RemoteSystemTempFiles
+obj/
 
 # Vim swap files
 *.swp
