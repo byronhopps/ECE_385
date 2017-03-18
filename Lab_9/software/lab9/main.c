@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "aes.h"
+
 #define to_hw_port (volatile char*) 0x00000000 // actual address here
 #define to_hw_sig (volatile char*) 0x00000000 // actual address here
 #define to_sw_port (char*) 0x00000000 // actual address here
@@ -47,7 +49,7 @@ int main()
 
         // TODO: Key Expansion and AES encryption using week 1's AES algorithm.
         unsigned char encryptedMsg[33];
-        encryptAES(plaintext, encryptedMsg);
+        encryptAES(plaintext, key, encryptedMsg);
 
         // Display the encryped message
         printf("\nEncrypted message is\n");

@@ -68,7 +68,7 @@ void shiftRows(unsigned char state[4][4])
 void mixColumns(unsigned char state[4][4])
 {
     // Variable to save the state of the current column
-    unsigned char tempCol;
+    unsigned char tempCol[4];
 
     for (int col = 0; col < 4; col++) {
 
@@ -90,7 +90,7 @@ void addRoundKey(unsigned char state[4][4], unsigned char key[4][4])
 {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            state ^= key;
+            state[i][j] ^= key[i][j];
 
     return;
 }
@@ -118,7 +118,8 @@ void keyExpansion(unsigned char key[17], unsigned char roundKeys[11][4][4])
             }
 
             if (col == 0) {
-                subWord(rotWord(temp));
+                rotWord(temp);
+                subWord(temp);
 
                 // Only need to XOR the first byte of the word
                 temp[0] ^= (Rcon[i-1]) >> 24;
