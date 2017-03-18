@@ -55,7 +55,7 @@ lab9_soc NiosII ( .clk_clk(CLOCK_50),
                      .sdram_wire_dqm(DRAM_DQM),
                      .sdram_wire_ras_n(DRAM_RAS_N),
                      .sdram_wire_we_n(DRAM_WE_N),
-                     .sdram_wire_clk(DRAM_CLK)
+                     .sdram_clk_clk(DRAM_CLK)
                      );
 
 io_module io_module0 (.clk(CLOCK_50),
@@ -82,13 +82,13 @@ aes_controller aes_controller0 (.clk(CLOCK_50),
 );
 
 // Displays the first 4 and the last 4 digits of the received message
-HexDriver Hex0 (.In0(msg_en[3:0]), .Out0(HEX0) );
-HexDriver Hex1 (.In0(msg_en[7:4]), .Out0(HEX1) );
-HexDriver Hex2 (.In0(msg_en[11:8]), .Out0(HEX2) );
-HexDriver Hex3 (.In0(msg_en[15:12]), .Out0(HEX3) );
-HexDriver Hex4 (.In0(msg_en[115:112]), .Out0(HEX4) );
-HexDriver Hex5 (.In0(msg_en[119:116]), .Out0(HEX5) );
-HexDriver Hex6 (.In0(msg_en[123:120]), .Out0(HEX6) );
-HexDriver Hex7 (.In0(msg_en[127:124]), .Out0(HEX7) );
+HexDriver Hex0 (.IN(msg_en[3:0]), .OUT(HEX0) );
+HexDriver Hex1 (.IN(msg_en[7:4]), .OUT(HEX1) );
+HexDriver Hex2 (.IN(msg_en[11:8]), .OUT(HEX2) );
+HexDriver Hex3 (.IN(msg_en[15:12]), .OUT(HEX3) );
+HexDriver Hex4 (.IN(msg_en[115:112]), .OUT(HEX4) );
+HexDriver Hex5 (.IN(msg_en[119:116]), .OUT(HEX5) );
+HexDriver Hex6 (.IN(msg_en[123:120]), .OUT(HEX6) );
+HexDriver Hex7 (.IN(msg_en[127:124]), .OUT(HEX7) );
 
 endmodule
