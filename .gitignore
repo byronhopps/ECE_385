@@ -33,7 +33,7 @@ db/
 
 # Eclipse files
 .metadata/
-RemoteSystemTempFiles
+RemoteSystemTempFiles/
 obj/
 
 # Vim swap files
