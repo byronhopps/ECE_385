@@ -200,7 +200,7 @@ void encryptAES(unsigned char plaintext[17], unsigned char key[17], unsigned cha
 void subBytes(unsigned char state[4][4]);
 void shiftRows(unsigned char state[4][4]);
 void mixColumns(unsigned char state[4][4]);
-void addRoundKey(unsigned char state[4][4], unsigned char[4][4] key);
+void addRoundKey(unsigned char state[4][4], unsigned char key[4][4]);
 
 // Key expansion stuff
 void keyExpansion(unsigned char key[17], unsigned char roundKeys[11][4][4]);

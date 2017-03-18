@@ -86,7 +86,7 @@ void mixColumns(unsigned char state[4][4])
     return;
 }
 
-void addRoundKey(unsigned char state[4][4], unsigned char[4][4] key)
+void addRoundKey(unsigned char state[4][4], unsigned char key[4][4])
 {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -114,7 +114,7 @@ void keyExpansion(unsigned char key[17], unsigned char roundKeys[11][4][4])
                 if (col == 0)
                     temp[row] = roundKeys[i-1][row][3];
                 else
-                    temp[row] = roundKeys[i][row][col-1]
+                    temp[row] = roundKeys[i][row][col-1];
             }
 
             if (col == 0) {
@@ -160,7 +160,7 @@ void rotWord(unsigned char word[4])
 
     // Copy the temporary word into the result vector
     for (int i = 0; i < 4; i++)
-        result[i] = temp[i];
+        word[i] = temp[i];
 
     return;
 }
