@@ -15,20 +15,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "system.h"
+
+#include "main.h"
 #include "aes.h"
 
-#define to_hw_port (volatile char*) 0x00000000 // actual address here
-#define to_hw_sig (volatile char*) 0x00000000 // actual address here
-#define to_sw_port (char*) 0x00000000 // actual address here
-#define to_sw_sig (char*) 0x00000000 // actual address here
-
-// TODO: AES Encryption related function calls
+#define to_hw_port (volatile char*) TO_HW_PORT_BASE // actual address here
+#define to_hw_sig (volatile char*) TO_HW_SIG_BASE // actual address here
+#define to_sw_port (char*) TO_SW_PORT_BASE // actual address here
+#define to_sw_sig (char*) TO_SW_SIG_BASE // actual address here
 
 int main()
 {
     int i;
-    unsigned char plaintext[33]; //should be 1 more character to account for string terminator
-    unsigned char key[33];
+    unsigned char plainText[33]; //should be 1 more character to account for string terminator
+    unsigned char plainKey[33];
 
     // Start with pressing reset
     *to_hw_sig = 0;
@@ -41,20 +42,29 @@ int main()
         printf("\n");
 
         printf("\nEnter plain text:\n");
-        scanf ("%s", plaintext);
+        scanf ("%s", plainText);
         printf ("\n");
         printf("\nEnter key:\n");
-        scanf ("%s", key);
+        scanf ("%s", plainKey);
         printf ("\n");
 
-        // TODO: Key Expansion and AES encryption using week 1's AES algorithm.
-        unsigned char encryptedMsg[33];
-        encryptAES(plaintext, key, encryptedMsg);
+        // Convert message and key from strings to byte arrays
+        unsigned char message[16];
+        unsigned char key[16];
 
-        // Display the encryped message
+        for (int i = 0; i < 16; i++) {
+            message[i] = charsToHex(plainText[2*i], plainText[2*i+1]);
+            key[i] = charsToHex(plainKey[2*i], plainKey[2*i+1]);
+        }
+
+        // Declare an array for the result and put the encrypted message there
+        unsigned char encryptedMsg[16];
+        encryptAES(message, key, encryptedMsg);
+
+        // Display the encrypted message
         printf("\nEncrypted message is\n");
-        for (int i = 0; encryptedMsg[i] != '\0'; i++) {
-            printf("\x", encryptedMsg[i]);
+        for (int i = 0; i < 16; i++) {
+            printf("%x", encryptedMsg[i]);
         }
         putchar('\n');
 
@@ -88,7 +98,7 @@ int main()
         for (i = 0; i < 16; ++i) {
             *to_hw_sig = 1;
             while (*to_sw_sig != 1);
-            str[i] = *to_sw_port;
+            //str[i] = *to_sw_port;
             *to_hw_sig = 2;
             while (*to_sw_sig != 0);
         }
