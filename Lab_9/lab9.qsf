@@ -1118,6 +1118,7 @@ set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name SYSTEMVERILOG_FILE HexDriver.sv
 set_global_assignment -name QIP_FILE lab9_soc/synthesis/lab9_soc.qip
 set_global_assignment -name SDC_FILE lab9.sdc
 set_global_assignment -name SYSTEMVERILOG_FILE SubBytes.sv

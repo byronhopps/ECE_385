@@ -58,12 +58,15 @@ module io_module (  input                clk,
     end
 
     always_comb begin
+
         // Next state logic
         next_state = state;
+
         unique case (state)
             RESET: begin
                 next_state = WAIT;
             end
+
             WAIT: begin
                 if (to_hw_sig == 2'd1)
                     next_state = READ_MSG_0;
@@ -72,21 +75,331 @@ module io_module (  input                clk,
                 else if (to_hw_sig == 2'd3)
                     next_state = SEND_TO_AES;
             end
+
+            // States for reading ciphertext from software
             READ_MSG_0: begin
                 if (to_hw_sig == 2'd2)
                     next_state = ACK_MSG_0;
             end
+
             READ_MSG_1: begin
                 if (to_hw_sig == 2'd2)
                     next_state = ACK_MSG_1;
             end
+
+            READ_MSG_2: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_2;
+            end
+
+            READ_MSG_3: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_3;
+            end
+
+            READ_MSG_4: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_4;
+            end
+
+            READ_MSG_5: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_5;
+            end
+
+            READ_MSG_6: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_6;
+            end
+
+            READ_MSG_7: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_7;
+            end
+
+            READ_MSG_8: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_8;
+            end
+
+            READ_MSG_9: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_9;
+            end
+
+            READ_MSG_10: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_10;
+            end
+
+            READ_MSG_11: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_11;
+            end
+
+            READ_MSG_12: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_12;
+            end
+
+            READ_MSG_13: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_13;
+            end
+
+            READ_MSG_14: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_14;
+            end
+
+            READ_MSG_15: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_MSG_15;
+            end
+
+
+            // Message achnowledgement states
             ACK_MSG_0: begin
                 if (to_hw_sig == 2'd1)
                     next_state = READ_MSG_1;
             end
+
             ACK_MSG_1: begin
                 if (to_hw_sig == 2'd1)
                     next_state = READ_MSG_2;
+            end
+
+            ACK_MSG_2: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_3;
+            end
+
+            ACK_MSG_3: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_4;
+            end
+
+            ACK_MSG_4: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_5;
+            end
+
+            ACK_MSG_5: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_6;
+            end
+
+            ACK_MSG_6: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_7;
+            end
+
+            ACK_MSG_7: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_8;
+            end
+
+            ACK_MSG_8: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_9;
+            end
+
+            ACK_MSG_9: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_10;
+            end
+
+            ACK_MSG_10: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_11;
+            end
+
+            ACK_MSG_11: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_12;
+            end
+
+            ACK_MSG_12: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_13;
+            end
+
+            ACK_MSG_13: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_14;
+            end
+
+            ACK_MSG_14: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_MSG_15;
+            end
+
+            ACK_MSG_15: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = WAIT;
+            end
+
+
+            // States for reading the key from software
+            READ_KEY_0: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_0;
+            end
+
+            READ_KEY_1: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_1;
+            end
+
+            READ_KEY_2: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_2;
+            end
+
+            READ_KEY_3: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_3;
+            end
+
+            READ_KEY_4: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_4;
+            end
+
+            READ_KEY_5: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_5;
+            end
+
+            READ_KEY_6: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_6;
+            end
+
+            READ_KEY_7: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_7;
+            end
+
+            READ_KEY_8: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_8;
+            end
+
+            READ_KEY_9: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_9;
+            end
+
+            READ_KEY_10: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_10;
+            end
+
+            READ_KEY_11: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_11;
+            end
+
+            READ_KEY_12: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_12;
+            end
+
+            READ_KEY_13: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_13;
+            end
+
+            READ_KEY_14: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_14;
+            end
+
+            READ_KEY_15: begin
+                if (to_hw_sig == 2'd2)
+                    next_state = ACK_KEY_15;
+            end
+
+            // States for confirming receipt of key
+            ACK_KEY_0: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_1;
+            end
+
+            ACK_KEY_1: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_2;
+            end
+
+            ACK_KEY_2: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_3;
+            end
+
+            ACK_KEY_3: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_4;
+            end
+
+            ACK_KEY_4: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_5;
+            end
+
+            ACK_KEY_5: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_6;
+            end
+
+            ACK_KEY_6: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_7;
+            end
+
+            ACK_KEY_7: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_8;
+            end
+
+            ACK_KEY_8: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_9;
+            end
+
+            ACK_KEY_9: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_10;
+            end
+
+            ACK_KEY_10: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_11;
+            end
+
+            ACK_KEY_11: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_12;
+            end
+
+            ACK_KEY_12: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_13;
+            end
+
+            ACK_KEY_13: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_14;
+            end
+
+            ACK_KEY_14: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = READ_KEY_15;
+            end
+
+            ACK_KEY_15: begin
+                if (to_hw_sig == 2'd1)
+                    next_state = WAIT;
             end
 
             // TODO: other states
@@ -97,15 +410,40 @@ module io_module (  input                clk,
         msg_en_in = msg_en;
         key_in = key;
         unique case (state)
-            READ_MSG_0: begin
-                // Receiving the first byte of encrypted message
-                msg_en_in[127:120] = to_hw_port[7:0];
-            end
-            READ_MSG_1: begin
-                // Receiving the second byte of encrypted message
-                msg_en_in[119:112] = to_hw_port[7:0];
-            end
 
+            READ_MSG_0:   msg_en_in[127:120] = to_hw_port[7:0];
+            READ_MSG_1:   msg_en_in[119:112] = to_hw_port[7:0];
+            READ_MSG_2:   msg_en_in[111:104] = to_hw_port[7:0];
+            READ_MSG_3:   msg_en_in[103: 96] = to_hw_port[7:0];
+            READ_MSG_4:   msg_en_in[ 95: 88] = to_hw_port[7:0];
+            READ_MSG_5:   msg_en_in[ 87: 80] = to_hw_port[7:0];
+            READ_MSG_6:   msg_en_in[ 79: 72] = to_hw_port[7:0];
+            READ_MSG_7:   msg_en_in[ 71: 64] = to_hw_port[7:0];
+            READ_MSG_8:   msg_en_in[ 63: 56] = to_hw_port[7:0];
+            READ_MSG_9:   msg_en_in[ 55: 48] = to_hw_port[7:0];
+            READ_MSG_10:  msg_en_in[ 47: 40] = to_hw_port[7:0];
+            READ_MSG_11:  msg_en_in[ 39: 32] = to_hw_port[7:0];
+            READ_MSG_12:  msg_en_in[ 31: 24] = to_hw_port[7:0];
+            READ_MSG_13:  msg_en_in[ 23: 16] = to_hw_port[7:0];
+            READ_MSG_14:  msg_en_in[ 15:  8] = to_hw_port[7:0];
+            READ_MSG_15:  msg_en_in[  7:  0] = to_hw_port[7:0];
+
+            READ_KEY_0:   key_in[127:120] = to_hw_port[7:0];
+            READ_KEY_1:   key_in[119:112] = to_hw_port[7:0];
+            READ_KEY_2:   key_in[111:104] = to_hw_port[7:0];
+            READ_KEY_3:   key_in[103: 96] = to_hw_port[7:0];
+            READ_KEY_4:   key_in[ 95: 88] = to_hw_port[7:0];
+            READ_KEY_5:   key_in[ 87: 80] = to_hw_port[7:0];
+            READ_KEY_6:   key_in[ 79: 72] = to_hw_port[7:0];
+            READ_KEY_7:   key_in[ 71: 64] = to_hw_port[7:0];
+            READ_KEY_8:   key_in[ 63: 56] = to_hw_port[7:0];
+            READ_KEY_9:   key_in[ 55: 48] = to_hw_port[7:0];
+            READ_KEY_10:  key_in[ 47: 40] = to_hw_port[7:0];
+            READ_KEY_11:  key_in[ 39: 32] = to_hw_port[7:0];
+            READ_KEY_12:  key_in[ 31: 24] = to_hw_port[7:0];
+            READ_KEY_13:  key_in[ 23: 16] = to_hw_port[7:0];
+            READ_KEY_14:  key_in[ 15:  8] = to_hw_port[7:0];
+            READ_KEY_15:  key_in[  7:  0] = to_hw_port[7:0];
             // TODO: other states
 
         endcase
@@ -121,18 +459,75 @@ module io_module (  input                clk,
             WAIT: begin
                 to_sw_sig = 2'd0;
             end
-            READ_MSG_0: begin
-                to_sw_sig = 2'd1;
-            end
-            READ_MSG_1: begin
-                to_sw_sig = 2'd1;
-            end
-            ACK_MSG_0: begin
-                to_sw_sig = 2'd0;
-            end
-            ACK_MSG_1: begin
-                to_sw_sig = 2'd0;
-            end
+
+            READ_MSG_0:  to_sw_sig = 2'd1;
+            READ_MSG_1:  to_sw_sig = 2'd1;
+            READ_MSG_2:  to_sw_sig = 2'd1;
+            READ_MSG_3:  to_sw_sig = 2'd1;
+            READ_MSG_4:  to_sw_sig = 2'd1;
+            READ_MSG_5:  to_sw_sig = 2'd1;
+            READ_MSG_6:  to_sw_sig = 2'd1;
+            READ_MSG_7:  to_sw_sig = 2'd1;
+            READ_MSG_8:  to_sw_sig = 2'd1;
+            READ_MSG_9:  to_sw_sig = 2'd1;
+            READ_MSG_10: to_sw_sig = 2'd1;
+            READ_MSG_11: to_sw_sig = 2'd1;
+            READ_MSG_12: to_sw_sig = 2'd1;
+            READ_MSG_13: to_sw_sig = 2'd1;
+            READ_MSG_14: to_sw_sig = 2'd1;
+            READ_MSG_15: to_sw_sig = 2'd1;
+
+            ACK_MSG_0:  to_sw_sig = 2'd0;
+            ACK_MSG_1:  to_sw_sig = 2'd0;
+            ACK_MSG_2:  to_sw_sig = 2'd0;
+            ACK_MSG_3:  to_sw_sig = 2'd0;
+            ACK_MSG_4:  to_sw_sig = 2'd0;
+            ACK_MSG_5:  to_sw_sig = 2'd0;
+            ACK_MSG_6:  to_sw_sig = 2'd0;
+            ACK_MSG_7:  to_sw_sig = 2'd0;
+            ACK_MSG_8:  to_sw_sig = 2'd0;
+            ACK_MSG_9:  to_sw_sig = 2'd0;
+            ACK_MSG_10: to_sw_sig = 2'd0;
+            ACK_MSG_11: to_sw_sig = 2'd0;
+            ACK_MSG_12: to_sw_sig = 2'd0;
+            ACK_MSG_13: to_sw_sig = 2'd0;
+            ACK_MSG_14: to_sw_sig = 2'd0;
+            ACK_MSG_15: to_sw_sig = 2'd0;
+
+            READ_KEY_0:  to_sw_sig = 2'd1;
+            READ_KEY_1:  to_sw_sig = 2'd1;
+            READ_KEY_2:  to_sw_sig = 2'd1;
+            READ_KEY_3:  to_sw_sig = 2'd1;
+            READ_KEY_4:  to_sw_sig = 2'd1;
+            READ_KEY_5:  to_sw_sig = 2'd1;
+            READ_KEY_6:  to_sw_sig = 2'd1;
+            READ_KEY_7:  to_sw_sig = 2'd1;
+            READ_KEY_8:  to_sw_sig = 2'd1;
+            READ_KEY_9:  to_sw_sig = 2'd1;
+            READ_KEY_10: to_sw_sig = 2'd1;
+            READ_KEY_11: to_sw_sig = 2'd1;
+            READ_KEY_12: to_sw_sig = 2'd1;
+            READ_KEY_13: to_sw_sig = 2'd1;
+            READ_KEY_14: to_sw_sig = 2'd1;
+            READ_KEY_15: to_sw_sig = 2'd1;
+
+            ACK_KEY_0:  to_sw_sig = 2'd0;
+            ACK_KEY_1:  to_sw_sig = 2'd0;
+            ACK_KEY_2:  to_sw_sig = 2'd0;
+            ACK_KEY_3:  to_sw_sig = 2'd0;
+            ACK_KEY_4:  to_sw_sig = 2'd0;
+            ACK_KEY_5:  to_sw_sig = 2'd0;
+            ACK_KEY_6:  to_sw_sig = 2'd0;
+            ACK_KEY_7:  to_sw_sig = 2'd0;
+            ACK_KEY_8:  to_sw_sig = 2'd0;
+            ACK_KEY_9:  to_sw_sig = 2'd0;
+            ACK_KEY_10: to_sw_sig = 2'd0;
+            ACK_KEY_11: to_sw_sig = 2'd0;
+            ACK_KEY_12: to_sw_sig = 2'd0;
+            ACK_KEY_13: to_sw_sig = 2'd0;
+            ACK_KEY_14: to_sw_sig = 2'd0;
+            ACK_KEY_15: to_sw_sig = 2'd0;
+
             // ...some more states in between
             SEND_TO_AES: begin
                 to_sw_sig = 2'd0;
