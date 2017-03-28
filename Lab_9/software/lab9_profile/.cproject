@@ -10,7 +10,7 @@
 					<folderInfo id="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1207190511." name="/" resourcePath="">
 						<toolChain id="altera.nios2.mingw.gcc4.1234293374" name="MinGW Nios II GCC4" superClass="altera.nios2.mingw.gcc4">
 							<targetPlatform id="altera.nios2.mingw.gcc4.1936768488" name="Nios II" superClass="altera.nios2.mingw.gcc4"/>
-							<builder buildPath="${workspace_loc://lab9}" id="altera.tool.gnu.builder.mingw.1212235563" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="altera.tool.gnu.builder.mingw"/>
+							<builder buildPath="${workspace_loc://lab9_profile}" id="altera.tool.gnu.builder.mingw.1212235563" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="altera.tool.gnu.builder.mingw"/>
 							<tool id="altera.tool.gnu.c.compiler.mingw.518952874" name="Nios II GCC C Compiler" superClass="altera.tool.gnu.c.compiler.mingw">
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1039195301" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -40,9 +40,18 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="lab9.null.45877288" name="lab9"/>
+		<project id="lab9_profile.null.45877288" name="lab9_profile"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1207190511;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1207190511.;altera.tool.gnu.cpp.compiler.mingw.1516854720;cdt.managedbuild.tool.gnu.cpp.compiler.input.2007378697">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1207190511;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.1207190511.;altera.tool.gnu.c.compiler.mingw.518952874;cdt.managedbuild.tool.gnu.c.compiler.input.1039195301">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="mem_init_install" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
@@ -72,13 +81,4 @@
 		</buildTargets>
 	</storageModule>
 	<storageModule moduleId="refreshScope"/>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.867561678;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.867561678.;altera.tool.gnu.cpp.compiler.mingw.1897815737;cdt.managedbuild.tool.gnu.cpp.compiler.input.266978153">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.867561678;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.867561678.;altera.tool.gnu.c.compiler.mingw.596537388;cdt.managedbuild.tool.gnu.c.compiler.input.50905967">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 </cproject>

@@ -139,7 +139,7 @@ ACDS_VERSION := 15.0
 # Define path to the application ELF. 
 # It may be used by the makefile fragments so is defined before including them. 
 # 
-ELF := lab9.elf
+ELF := lab9_profile.elf
 
 # Paths to C, C++, and assembly source files.
 C_SRCS += main.c
@@ -178,7 +178,7 @@ CRT0 :=
 SYS_LIB :=
 
 # Define path to the root of the BSP.
-BSP_ROOT_DIR := ../lab9_bsp/
+BSP_ROOT_DIR := ../lab9_bsp
 
 # List of application specific include directories, library directories and library names
 APP_INCLUDE_DIRS :=
