@@ -22,8 +22,8 @@
 
 #define to_hw_port (volatile char*) TO_HW_PORT_BASE // actual address here
 #define to_hw_sig (volatile char*) TO_HW_SIG_BASE // actual address here
-#define to_sw_port (char*) TO_SW_PORT_BASE // actual address here
-#define to_sw_sig (char*) TO_SW_SIG_BASE // actual address here
+#define to_sw_port (volatile char*) TO_SW_PORT_BASE // actual address here
+#define to_sw_sig (volatile char*) TO_SW_SIG_BASE // actual address here
 
 int main()
 {
@@ -67,14 +67,15 @@ int main()
             printf("%x", encryptedMsg[i]);
         }
         putchar('\n');
+        fflush(stdout);
 
         // Transmit encrypted message to hardware side for decryption.
         printf("\nTransmitting message...\n");
 
         for (i = 0; i < 16; i++) {
             *to_hw_sig = 1;
-            *to_hw_port = encryptedMsg[i]; // encryptedMsg is your encrypted message
-            // Consider to use charToHex() if your encrypted message is a string.
+            *to_hw_port = encryptedMsg[i];
+
             while (*to_sw_sig != 1);
             *to_hw_sig = 2;
             while (*to_sw_sig != 0);
@@ -84,30 +85,60 @@ int main()
         // Transmit encrypted message to hardware side for decryption.
         printf("\nTransmitting key...\n");
 
-        //TODO: Transmit key
+        for (i = 0; i < 16; i++) {
+            *to_hw_sig = 2;
+            *to_hw_port = key[i];
+
+            while (*to_sw_sig != 1);
+            *to_hw_sig = 1;
+            while (*to_sw_sig != 0);
+        }
+        *to_hw_sig = 0;
 
         printf("\n\n");
 
-        // Skip rest of code for week 1
-        continue;
+        // Initiate AES decryption
+        *to_hw_sig = 3;
 
+        // Wait for the AES module to finish
         while (*to_sw_sig != 2);
 
+        // Indicate that we're ready to receive the result
+        *to_hw_sig = 1;
+
+        // Start retrieving the message
         printf("\nRetrieving message...\n");
 
+        unsigned char decodedMessage[16];
         for (i = 0; i < 16; ++i) {
+
+            // Ready to receive byte
             *to_hw_sig = 1;
+
+            // Wait for hardware to be ready to send
             while (*to_sw_sig != 1);
-            //str[i] = *to_sw_port;
+
+            // Read value from hardware
+            decodedMessage[i] = *to_sw_port;
+
+            // Confirm receipt of data
             *to_hw_sig = 2;
+
+            // Wait for hardware to acknowledge receipt of data
             while (*to_sw_sig != 0);
         }
 
-        printf("\n\n");
+        // Return to wait state
+        *to_sw_sig = 0;
+
+        //printf("\n\n");
 
         printf("Decoded message:\n");
-
-        // TODO: print decoded message
+        for (i = 0; i < 16; i++) {
+            printf("%X", decodedMessage[i]);
+        }
+        putchar('\n');
+        fflush(stdout);
     }
 
     return 0;
