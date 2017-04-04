@@ -4,17 +4,11 @@ timeunit 10ns;
 timeprecision 1ns;
 
 // Internal logic signals
-logic clk, reset_n, run;
-//logic [31:0] key_0, key_1, key_2, key_3;
+logic clk, reset_n, run, ready;
 logic [127:0] msg_en, msg_de, key;
-//logic [127:0] key_in, msg_in;
-logic ready;
 
 // Instantiate the AES module to be tested
 AES AES_module (.*);
-
-//transpose keyTranspose (.in(key_in), .out(key));
-//transpose msgTranspose (.in(msg_in), .out(msg_en));
 
 // Test program
 initial begin : TEST_PROGRAM

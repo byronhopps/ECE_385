@@ -29,8 +29,6 @@ module  AES ( input  logic         clk, reset_n, run,
               output logic [127:0] msg_de,
               output logic         ready
           );
-//            input  logic [31:0]  key_0, key_1, key_2, key_3,
-//            output logic [31:0]  keyschedule_out_0, keyschedule_out_1, keyschedule_out_2, keyschedule_out_3
 
 logic [1407:0] keyschedule;
 logic [127:0] message, nextMessage;
@@ -47,13 +45,7 @@ enum logic [4:0] {
     ADD_ROUND_KEY, INV_MIX_COLUMNS_0, INV_MIX_COLUMNS_1, INV_MIX_COLUMNS_2, INV_MIX_COLUMNS_3, DONE
     } state, nextState;
 
-//assign {keyschedule_out_0, keyschedule_out_1, keyschedule_out_2, keyschedule_out_3} = keyschedule[127:0];
-//assign key[127:0] = {key_3, key_2, key_1, key_0};
-
-KeyExpansion keyexpansion_0(.clk(clk),
-                            .Cipherkey(key),
-                            .KeySchedule(keyschedule)
-    );
+KeyExpansion keyexpansion_0(.clk(clk), .Cipherkey(key), .KeySchedule(keyschedule));
 
 InvSubBytes invSubBytes_0  (.clk, .in(message[  7:  0]), .out(msgSubBytes[  7:  0]));
 InvSubBytes invSubBytes_1  (.clk, .in(message[ 15:  8]), .out(msgSubBytes[ 15:  8]));
@@ -99,7 +91,7 @@ always_comb begin
         READY: if (run == 1'b1) nextState = KEY_EXPANSION;
         DONE: nextState = READY;
 
-        KEY_EXPANSION: if (count >= 4'd8) nextState = ADD_ROUND_KEY_I;
+        KEY_EXPANSION: if (count >= 4'd5) nextState = ADD_ROUND_KEY_I;
         ADD_ROUND_KEY_I: nextState = INV_SHIFT_ROWS;
         INV_SHIFT_ROWS: nextState = INV_SUB_BYTES_1;
         INV_SUB_BYTES_1: nextState = INV_SUB_BYTES_2;

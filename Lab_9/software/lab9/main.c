@@ -20,10 +20,10 @@
 #include "main.h"
 #include "aes.h"
 
-#define to_hw_port (volatile char*) TO_HW_PORT_BASE // actual address here
-#define to_hw_sig (volatile char*) TO_HW_SIG_BASE // actual address here
-#define to_sw_port (volatile char*) TO_SW_PORT_BASE // actual address here
-#define to_sw_sig (volatile char*) TO_SW_SIG_BASE // actual address here
+#define to_hw_port (volatile char*) TO_HW_PORT_BASE
+#define to_hw_sig (volatile char*) TO_HW_SIG_BASE
+#define to_sw_port (volatile char*) TO_SW_PORT_BASE
+#define to_sw_sig (volatile char*) TO_SW_SIG_BASE
 
 int main()
 {

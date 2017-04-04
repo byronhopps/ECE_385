@@ -85,7 +85,7 @@ aes_controller aes_controller0 (.clk(CLOCK_50),
 
 logic [127:0] hexDisp;
 always_comb begin
-    case (SW[1:0])
+    case (SW[2:0])
         0: hexDisp = msg_en;
         1: hexDisp = key;
         2: hexDisp = msg_de;
