@@ -1,19 +1,50 @@
 `include "Types.sv"
 
+module Bullet (
+    input  logic frameClk, reset,
+    input  logic sigKill, sigSpawn, sigBounce,
+
+    input  DIRECTION   bulletStartDir,
+    input  logic [7:0] bulletRadius,
+    input  logic [7:0] bulletStep, bulletLife,
+    input  logic [9:0] pixelPosX, pixelPosY,
+    input  logic [9:0] bulletStartX, bulletStartY,
+
+    output logic       bulletExists,
+    output logic [9:0] bulletPosX, bulletPosY,
+    output COLOR       bulletColor
+);
+
+BulletEntity bulletEntity (
+    .frameClk, .reset, .sigKill, .sigSpawn, .sigBounce,
+    .bulletStartDir, .bulletStep, .bulletLife,
+    .bulletStartX, .bulletStartY,
+    .bulletExists, .bulletPosX, .bulletPosY
+);
+
+BulletMapper bulletMapper(
+    .bulletPosX, .bulletPosY, .pixelPosX, .pixelPosY,
+    .bulletRadius, .bulletColor
+);
+
+endmodule
+
+
+
 module BulletEntity (
     input  logic frameClk, reset,
     input  logic sigKill, sigSpawn, sigBounce,
 
     input  DIRECTION    bulletStartDir,
     input  logic [7:0]  bulletStep, bulletLife,
-    input  logic [31:0] bulletStartX, bulletStartY,
+    input  logic [9:0]  bulletStartX, bulletStartY,
 
     output logic bulletExists,
-    output logic [31:0] curPosX, curPosY,
+    output logic [9:0] bulletPosX, bulletPosY,
 );
 
 // Bullet movement control logic
-logic [31:0] nextPosX, nextPosY;
+logic [9:0] nextPosX, nextPosY;
 always_comb begin
 
     // On sigSpawn reset position to start position
@@ -25,28 +56,28 @@ always_comb begin
     end else begin
         unique case (bulletDir)
             UP: begin
-                nextPosX = curPosX;
-                nextPosY = curPosY - bulletStep;
+                nextPosX = bulletPosX;
+                nextPosY = bulletPosY - bulletStep;
             end
 
             DOWN: begin
-                nextPosX = curPosX;
-                nextPosY = curPosY + bulletStep;
+                nextPosX = bulletPosX;
+                nextPosY = bulletPosY + bulletStep;
             end
 
             LEFT: begin
-                nextPosX = curPosX - bulletStep;
-                nextPosY = curPosY;
+                nextPosX = bulletPosX - bulletStep;
+                nextPosY = bulletPosY;
             end
 
             RIGHT: begin
-                nextPosX = curPosX + bulletStep;
-                nextPosY = curPosY;
+                nextPosX = bulletPosX + bulletStep;
+                nextPosY = bulletPosY;
             end
 
             default: begin
-                nextPosX = curPosX;
-                nextPosY = curPosY;
+                nextPosX = bulletPosX;
+                nextPosY = bulletPosY;
                 $error("Unhandled direction in bullet direction control")
             end
         endcase
@@ -56,11 +87,11 @@ end
 // Registers for bullet position
 always_ff @ (posedge frameClk) begin
     if (reset == 1'b1) begin
-        curPosX <= '0;
-        curPosY <= '0;
+        bulletPosX <= '0;
+        bulletPosY <= '0;
     end else begin
-        curPosX <= nextPosX;
-        curPosY <= nextPosY;
+        bulletPosX <= nextPosX;
+        bulletPosY <= nextPosY;
     end
 end
 
@@ -128,6 +159,29 @@ always_comb begin
         bounceCountNext = '0;
     else if (sigBounce = 1'b1)
         bounceCountNext = bounceCount + 1;
+end
+
+endmodule
+
+
+
+module BulletMapper (
+    input  logic [9:0] bulletPosX, bulletPosY,
+    input  logic [9:0] pixelPosX, pixelPosY,
+    input  logic [7:0] bulletRadius,
+    output COLOR       bulletColor
+);
+
+always_comb begin
+    // If the current pixel is within a box of radius bulletRadius centered at bulletPos
+    // TODO: verify that this works even with overflow/underflow
+    if (bulletPosX-bulletRadius <= pixelPosX && pixelPosX <= bulletPosX+bulletRadius
+     && bulletPosY-bulletRadius <= pixelPosY && pixelPosY <= bulletPosY+bulletRadius) begin
+
+        bulletColor = BULLET;
+    end else begin
+        bulletColor = BACKGROUND;
+    end
 end
 
 endmodule
