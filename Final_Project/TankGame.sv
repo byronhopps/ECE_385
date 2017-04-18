@@ -35,4 +35,33 @@ module TankGame (
                         DRAM_CLK      //SDRAM Clock
 );
 
+// TODO: Add SOC to design
+
+
+// Signal for current pixel being drawn
+logic [9:0] xPixel, yPixel;
+logic frameClk;
+assign frameClk = VGA_VS;
+
+// Main VGA controller for design
+VGA_controller vga_controller_instance(
+    .Clk, .Reset(Reset_h),
+    .VGA_HS, .VGA_VS,
+    .VGA_CLK,
+    .VGA_BLANK_N,
+    .VGA_SYNC_N,
+    .DrawX(xPixel), .DrawY(yPixel)
+);
+
+// Control hardware for tank 0
+TankEntity tank_0 (
+    .frameClk, .tankReset(),
+    .moveUp(), .moveDown(), .moveLeft(), .moveRight(),
+    .tankStep(10), .tankDir(), .tankExists()
+    .tankPosX(), .tankPosY(),
+    .curPosX(), .curPosY(),
+    .nextPosX(), .nextPosY()
+);
+
+
 endmodule
