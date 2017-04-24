@@ -1,7 +1,5 @@
-`include "Types.sv"
-
 module Bullet (
-    input  logic frameClk, reset,
+    input  logic frameClk, reset_h,
     input  logic sigKill, sigSpawn, sigBounce,
 
     input  DIRECTION   bulletStartDir,
@@ -16,7 +14,7 @@ module Bullet (
 );
 
 BulletEntity bulletEntity (
-    .frameClk, .reset, .sigKill, .sigSpawn, .sigBounce,
+    .frameClk, .reset(reset_h), .sigKill, .sigSpawn, .sigBounce,
     .bulletStartDir, .bulletStep, .bulletLife,
     .bulletStartX, .bulletStartY,
     .bulletExists, .bulletPosX, .bulletPosY
@@ -24,7 +22,7 @@ BulletEntity bulletEntity (
 
 BulletMapper bulletMapper(
     .bulletPosX, .bulletPosY, .pixelPosX, .pixelPosY,
-    .bulletRadius, .bulletColor
+    .bulletExists, .bulletRadius, .bulletColor
 );
 
 endmodule
@@ -40,20 +38,21 @@ module BulletEntity (
     input  logic [9:0]  bulletStartX, bulletStartY,
 
     output logic bulletExists,
-    output logic [9:0] bulletPosX, bulletPosY,
+    output logic [9:0] bulletPosX, bulletPosY
 );
 
 // Bullet movement control logic
 logic [9:0] nextPosX, nextPosY;
 always_comb begin
 
-    // On sigSpawn reset position to start position
-    if (sigSpawn = 1'b1) begin
+    // On sigSpawn reset position to start position if the bullet doesn't exist
+    if (sigSpawn == 1'b1 && !bulletExists) begin
         nextPosX = bulletStartX;
         nextPosY = bulletStartY;
+    end
 
     // Otherwise update positon based on the current direction
-    end else begin
+    else begin
         unique case (bulletDir)
             UP: begin
                 nextPosX = bulletPosX;
@@ -78,7 +77,7 @@ always_comb begin
             default: begin
                 nextPosX = bulletPosX;
                 nextPosY = bulletPosY;
-                $error("Unhandled direction in bullet direction control")
+                $error("Unhandled direction in bullet direction control");
             end
         endcase
     end
@@ -99,13 +98,14 @@ end
 DIRECTION bulletDir, nextDir;
 always_comb begin
 
-    if (sigSpawn == 1'b1) begin
+    // NOTE: removing the bulletExists check results in an alternate game mode
+    if (sigSpawn == 1'b1 && !bulletExists) begin
         nextDir = bulletStartDir;
     end
 
     // Change direction on bounce signal
-    else if (bounce == 1'b1) begin
-        unique case (dir)
+    else if (sigBounce == 1'b1) begin
+        unique case (bulletDir)
             UP:    nextDir = DOWN;
             DOWN:  nextDir = UP;
             LEFT:  nextDir = RIGHT;
@@ -113,7 +113,7 @@ always_comb begin
 
             default: begin
                 nextDir = bulletDir;
-                $error("Unhandled direction in bullet direction change logic")
+                $error("Unhandled direction in bullet direction change logic");
             end
         endcase
     end
@@ -139,7 +139,7 @@ end
 always_ff @ (posedge frameClk) begin
     if (reset == 1'b1 || sigKill == 1'b1 || bounceCountNext >= bulletLife + 1) begin
         bulletExists <= 1'b0;
-    end else if (sigSpawn == 1'b1)
+    end else if (sigSpawn == 1'b1) begin
         bulletExists <= 1'b1;
     end
 end
@@ -147,7 +147,7 @@ end
 // Logic for counting the number of bounces
 logic [7:0] bounceCount, bounceCountNext;
 always_ff @ (posedge frameClk) begin
-    if (reset == 1'b1)
+    if (reset == 1'b1 || sigSpawn == 1'b1) begin
         bounceCount = '0;
     else
         bounceCount <= bounceCountNext;
@@ -155,9 +155,9 @@ end
 
 always_comb begin
     bounceCountNext = bounceCount;
-    if (sigSpawn = 1'b1)
+    if (sigSpawn == 1'b1)
         bounceCountNext = '0;
-    else if (sigBounce = 1'b1)
+    else if (sigBounce == 1'b1)
         bounceCountNext = bounceCount + 1;
 end
 
@@ -169,13 +169,15 @@ module BulletMapper (
     input  logic [9:0] bulletPosX, bulletPosY,
     input  logic [9:0] pixelPosX, pixelPosY,
     input  logic [7:0] bulletRadius,
+    input  logic       bulletExists,
     output COLOR       bulletColor
 );
 
 always_comb begin
     // If the current pixel is within a box of radius bulletRadius centered at bulletPos
     // TODO: verify that this works even with overflow/underflow
-    if (bulletPosX-bulletRadius <= pixelPosX && pixelPosX <= bulletPosX+bulletRadius
+    if (bulletExists == 1'b1
+     && bulletPosX-bulletRadius <= pixelPosX && pixelPosX <= bulletPosX+bulletRadius
      && bulletPosY-bulletRadius <= pixelPosY && pixelPosY <= bulletPosY+bulletRadius) begin
 
         bulletColor = BULLET;

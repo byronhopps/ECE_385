@@ -1,11 +1,9 @@
-`include "Types.sv" 
-
 module Tank (
-    input  logic frameClk, reset,
+    input  logic frameClk, reset_h,
     input  logic moveUp, moveDown, moveLeft, moveRight,
-    input  logic sigKill, sigSpawn,
+    input  logic sigKill, sigSpawn, sigStop,
 
-    input  logic [9:0] tankPosX, tankPosY,
+    input  logic [9:0] spawnPosX, spawnPosY,
     input  logic [9:0] pixelPosX, pixelPosY,
 
     input  logic [9:0] tankStep,
@@ -20,11 +18,11 @@ module Tank (
 );
 
 TankEntity tankEntity (
-    .frameClk, .tankReset(reset),
+    .frameClk, .tankReset(reset_h),
     .moveUp, .moveDown, .moveLeft, .moveRight,
-    .sigKill, .sigSpawn, .tankStep,
-    .tankPosX, .tankPosY,
+    .sigKill, .sigSpawn, .sigStop, .tankStep,
     .tankDir, .tankExists,
+    .spawnPosX, .spawnPosY,
     .curPosX, .curPosY, .nextPosX, .nextPosY
 );
 
@@ -39,15 +37,14 @@ endmodule
 
 
 
-// TODO: Add sigCollide and clean up position logic
 // TODO: Change input signaling to be of type DIRECTION
 module TankEntity (
     input  logic frameClk, tankReset,
     input  logic moveUp, moveDown, moveLeft, moveRight,
-    input  logic sigKill, sigSpawn,
+    input  logic sigKill, sigSpawn, sigStop,
 
     input  logic [9:0] tankStep,
-    input  logic [9:0] tankPosX, tankPosY,
+    input  logic [9:0] spawnPosX, spawnPosY,
 
     output DIRECTION    tankDir,
     output logic        tankExists,
@@ -56,8 +53,8 @@ module TankEntity (
 );
 
 always_comb begin
-    nextPosX = tankPosX;
-    nextPosY = tankPosY;
+    nextPosX = curPosX;
+    nextPosY = curPosY;
     nextDir = tankDir;
 
     // Process movement if the tank exists
@@ -65,34 +62,43 @@ always_comb begin
         case ({moveUp, moveDown, moveLeft, moveRight})
             4'b1000: begin
                 nextPosY -= tankStep;
-                nextDir == UP;
+                nextDir = UP;
             end
 
             4'b0100: begin
                 nextPosY += tankStep;
-                nextDir == DOWN;
+                nextDir = DOWN;
             end
 
             4'b0010: begin
                 nextPosX -= tankStep;
-                nextDir == LEFT;
+                nextDir = LEFT;
             end
 
             4'b0001: begin
                 nextPosX += tankStep;
-                nextDir == RIGHT;
+                nextDir = RIGHT;
             end
+            
+            default: begin end
         endcase
     end
 end
 
+// Tank position registers
 always_ff @ (posedge frameClk) begin
     if (tankReset == 1'b1) begin
         curPosX <= '0;
         curPosY <= '0;
+    end else if (sigSpawn == 1'b1) begin
+        curPosX <= spawnPosX;
+        curPosY <= spawnPosY;
+    end else if (sigStop == 1'b1) begin
+        curPosX <= curPosX;
+        curPosY <= curPosY;
     end else begin
-        curPosX <= tankPosX;
-        curPosY <= tankPosY;
+        curPosX <= nextPosX;
+        curPosY <= nextPosY;
     end
 end
 
@@ -106,8 +112,8 @@ always_ff @ (posedge frameClk) begin
 end
 
 always_ff @ (posedge frameClk) begin
-    unique case({tankReset, sigSpawn, sigKill})
-        3'b1XX: tankExists <= 1'b0;
+    unique casez({tankReset, sigSpawn, sigKill})
+        3'b1??: tankExists <= 1'b0;
         3'b010: tankExists <= 1'b1;
         3'b001: tankExists <= 1'b0;
         3'b000: tankExists <= tankExists;
@@ -175,7 +181,9 @@ always_comb begin
         end
 
     end else begin
+        isTurret = 1'bX;
         tankColor = BACKGROUND;
+    end
 
 end
 
