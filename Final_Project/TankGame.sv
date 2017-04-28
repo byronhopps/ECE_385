@@ -140,6 +140,8 @@ logic bulletCollideTank1[1:0];
 logic bulletHitBullet;
 logic [9:0] curTankPosX [1:0];
 logic [9:0] curTankPosY [1:0];
+logic [9:0] nextTankPosX [1:0];
+logic [9:0] nextTankPosY [1:0];
 logic [7:0] tankRadius, bulletRadius;
 
 assign tankRadius = 10;
@@ -174,7 +176,7 @@ Tank tank_0 (
     .spawnPosX(50), .spawnPosY(50),
     .tankStep(2), .tankRadius, .turretWidth(3),
     .tankDir(tankDir[0]), .tankColor(tankPixelColor[0]), .tankExists(tankExists[0]),
-    .curPosX(curTankPosX[0]), .curPosY(curTankPosY[0]), .nextPosX(), .nextPosY()
+    .curPosX(curTankPosX[0]), .curPosY(curTankPosY[0]), .nextPosX(nextTankPosX[0]), .nextPosY(nextTankPosY[0])
 );
 
 // Control hardware for tank 1
@@ -187,7 +189,7 @@ Tank tank_1 (
     .spawnPosX(590), .spawnPosY(430),
     .tankStep(2), .tankRadius, .turretWidth(3),
     .tankDir(tankDir[1]), .tankColor(tankPixelColor[1]), .tankExists(tankExists[1]),
-    .curPosX(curTankPosX[1]), .curPosY(curTankPosY[1]), .nextPosX(), .nextPosY()
+    .curPosX(curTankPosX[1]), .curPosY(curTankPosY[1]), .nextPosX(nextTankPosX[1]), .nextPosY(nextTankPosY[1])
 );
 
 
@@ -273,23 +275,23 @@ logic [9:0] bulletStartY [1:0];
 always_comb begin
     case (tankDir[1])
         UP: begin
-            bulletStartX[1] = curTankPosX[1];
-            bulletStartY[1] = curTankPosY[1] - tankRadius - bulletRadius - 1;
+            bulletStartX[1] = nextTankPosX[1];
+            bulletStartY[1] = nextTankPosY[1] - tankRadius - bulletRadius - 1;
         end
 
         DOWN: begin
-            bulletStartX[1] = curTankPosX[1];
-            bulletStartY[1] = curTankPosY[1] + tankRadius + bulletRadius + 1;
+            bulletStartX[1] = nextTankPosX[1];
+            bulletStartY[1] = nextTankPosY[1] + tankRadius + bulletRadius + 1;
         end
 
         LEFT: begin
-            bulletStartX[1] = curTankPosX[1] - tankRadius - bulletRadius - 1;
-            bulletStartY[1] = curTankPosY[1];
+            bulletStartX[1] = nextTankPosX[1] - tankRadius - bulletRadius - 1;
+            bulletStartY[1] = nextTankPosY[1];
         end
 
         RIGHT: begin
-            bulletStartX[1] = curTankPosX[1] + tankRadius + bulletRadius + 1;
-            bulletStartY[1] = curTankPosY[1];
+            bulletStartX[1] = nextTankPosX[1] + tankRadius + bulletRadius + 1;
+            bulletStartY[1] = nextTankPosY[1];
         end
 
         default: begin
@@ -303,23 +305,23 @@ end
 always_comb begin
     case (tankDir[0])
         UP: begin
-            bulletStartX[0] = curTankPosX[0];
-            bulletStartY[0] = curTankPosY[0] - tankRadius - bulletRadius - 1;
+            bulletStartX[0] = nextTankPosX[0];
+            bulletStartY[0] = nextTankPosY[0] - tankRadius - bulletRadius - 1;
         end
 
         DOWN: begin
-            bulletStartX[0] = curTankPosX[0];
-            bulletStartY[0] = curTankPosY[0] + tankRadius + bulletRadius + 1;
+            bulletStartX[0] = nextTankPosX[0];
+            bulletStartY[0] = nextTankPosY[0] + tankRadius + bulletRadius + 1;
         end
 
         LEFT: begin
-            bulletStartX[0] = curTankPosX[0] - tankRadius - bulletRadius - 1;
-            bulletStartY[0] = curTankPosY[0];
+            bulletStartX[0] = nextTankPosX[0] - tankRadius - bulletRadius - 1;
+            bulletStartY[0] = nextTankPosY[0];
         end
 
         RIGHT: begin
-            bulletStartX[0] = curTankPosX[0] + tankRadius + bulletRadius + 1;
-            bulletStartY[0] = curTankPosY[0];
+            bulletStartX[0] = nextTankPosX[0] + tankRadius + bulletRadius + 1;
+            bulletStartY[0] = nextTankPosY[0];
         end
 
         default: begin
