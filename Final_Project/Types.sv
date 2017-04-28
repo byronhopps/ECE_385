@@ -12,3 +12,18 @@ typedef enum logic [23:0] {
     TURRET_2 = 24'h0000FF, TANK_2 = 24'h555588,
     TURRET_3 = 24'h00FFFF, TANK_3 = 24'h558888
 } COLOR;
+
+typedef struct {
+    logic [9:0] x;
+    logic [9:0] y;
+} POSITION;
+
+typedef struct {
+    logic [8:0] x;
+    logic [8:0] y;
+} RADIUS;
+
+typedef struct {
+    POSITION center;
+    RADIUS radius;
+} RECT;
