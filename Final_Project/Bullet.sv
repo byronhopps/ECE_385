@@ -13,11 +13,20 @@ module Bullet (
     output COLOR       bulletColor
 );
 
+logic sigBounceInt, arenaEdgeCollide;
+assign sigBounceInt = arenaEdgeCollide | sigBounce;
+
 BulletEntity bulletEntity (
-    .frameClk, .reset(reset_h), .sigKill, .sigSpawn, .sigBounce,
+    .frameClk, .reset(reset_h), .sigKill, .sigSpawn,
+    .sigBounce(sigBounceInt),
     .bulletStartDir, .bulletStep, .bulletLife,
     .bulletStartX, .bulletStartY,
     .bulletExists, .bulletPosX, .bulletPosY
+);
+
+ArenaEdgeDetect bulletEdgeDetect (
+    .posX(bulletPosX), .posY(bulletPosY), .radius(bulletRadius),
+    .collide(arenaEdgeCollide)
 );
 
 BulletMapper bulletMapper(
@@ -43,44 +52,88 @@ module BulletEntity (
 
 // Bullet movement control logic
 logic [9:0] nextPosX, nextPosY;
+
+enum logic [1:0] {DEAD, SPAWNED, MOVING, BOUNCE} state, nextState;
+
+assign bulletExists = (state != DEAD);
+
+// State transition logic
 always_comb begin
+    nextState = state;
+    case (state)
+        DEAD: if(sigSpawn) nextState = SPAWNED;
+        SPAWNED: nextState = MOVING;
 
-    // On sigSpawn reset position to start position if the bullet doesn't exist
-    if (sigSpawn == 1'b1 && !bulletExists) begin
-        nextPosX = bulletStartX;
-        nextPosY = bulletStartY;
+        MOVING: begin
+            if (sigKill) begin
+                nextState = DEAD;
+            end else if (sigBounce) begin
+                nextState = BOUNCE;
+            end
+        end
+
+        BOUNCE: begin
+            if (bounceCountNext > bulletLife) begin
+                nextState = DEAD;
+            end else begin
+                nextState = MOVING;
+            end
+        end
+    endcase
+end
+
+// Register for state
+always_ff @ (posedge frameClk) begin
+    if (reset == 1'b1) begin
+        state <= DEAD;
+    end else begin
+        state <= nextState;
     end
+end
 
-    // Otherwise update positon based on the current direction
-    else begin
-        unique case (bulletDir)
-            UP: begin
-                nextPosX = bulletPosX;
-                nextPosY = bulletPosY - bulletStep;
-            end
+// Logic for determining bullet position
+always_comb begin
+    nextPosX = bulletPosX;
+    nextPosY = bulletPosY;
 
-            DOWN: begin
-                nextPosX = bulletPosX;
-                nextPosY = bulletPosY + bulletStep;
-            end
+    case (state)
+        DEAD:
+        SPAWNED: begin
+            nextPosX = bulletStartX;
+            nextPosY = bulletStartY;
+        end
 
-            LEFT: begin
-                nextPosX = bulletPosX - bulletStep;
-                nextPosY = bulletPosY;
-            end
+        // TODO: Make this the bounce state as well?
+        MOVING: begin
+            unique case (bulletDir)
+                UP: begin
+                    nextPosX = bulletPosX;
+                    nextPosY = bulletPosY - bulletStep;
+                end
 
-            RIGHT: begin
-                nextPosX = bulletPosX + bulletStep;
-                nextPosY = bulletPosY;
-            end
+                DOWN: begin
+                    nextPosX = bulletPosX;
+                    nextPosY = bulletPosY + bulletStep;
+                end
 
-            default: begin
-                nextPosX = bulletPosX;
-                nextPosY = bulletPosY;
-                $error("Unhandled direction in bullet direction control");
-            end
-        endcase
-    end
+                LEFT: begin
+                    nextPosX = bulletPosX - bulletStep;
+                    nextPosY = bulletPosY;
+                end
+
+                RIGHT: begin
+                    nextPosX = bulletPosX + bulletStep;
+                    nextPosY = bulletPosY;
+                end
+
+                default: begin
+                    nextPosX = bulletPosX;
+                    nextPosY = bulletPosY;
+                    $error("Unhandled direction in bullet direction control");
+                end
+            endcase
+        end
+    endcase
 end
 
 // Registers for bullet position
@@ -97,33 +150,25 @@ end
 // Bullet direction control logic
 DIRECTION bulletDir, nextDir;
 always_comb begin
+    nextDir = bulletDir;
+    case (state)
+        SPAWNED: nextDir = bulletStartDir;
+        MOVING: nextDir = bulletDir;
+        BOUNCE: begin
+            unique case (bulletDir)
+                UP:    nextDir = DOWN;
+                DOWN:  nextDir = UP;
+                LEFT:  nextDir = RIGHT;
+                RIGHT: nextDir = LEFT;
 
-    // NOTE: removing the bulletExists check results in an alternate game mode
-    if (sigSpawn == 1'b1 && !bulletExists) begin
-        nextDir = bulletStartDir;
-    end
-
-    // Change direction on bounce signal
-    else if (sigBounce == 1'b1) begin
-        unique case (bulletDir)
-            UP:    nextDir = DOWN;
-            DOWN:  nextDir = UP;
-            LEFT:  nextDir = RIGHT;
-            RIGHT: nextDir = LEFT;
-
-            default: begin
-                nextDir = bulletDir;
-                $error("Unhandled direction in bullet direction change logic");
-            end
-        endcase
-    end
-
-    // Maintain current direction unless bouncing
-    else begin
-        nextDir = bulletDir;
-    end
+                default: begin
+                    nextDir = bulletDir;
+                    $error("Unhandled direction in bullet direction change logic");
+                end
+            endcase
+        end
+    endcase
 end
-
 
 // Register for bullet direction
 always_ff @ (posedge frameClk) begin
@@ -134,31 +179,23 @@ always_ff @ (posedge frameClk) begin
     end
 end
 
-
-// Logic for bullet state tracking
-always_ff @ (posedge frameClk) begin
-    if (reset == 1'b1 || sigKill == 1'b1 || bounceCountNext >= bulletLife + 1) begin
-        bulletExists <= 1'b0;
-    end else if (sigSpawn == 1'b1) begin
-        bulletExists <= 1'b1;
-    end
-end
-
 // Logic for counting the number of bounces
 logic [7:0] bounceCount, bounceCountNext;
 always_ff @ (posedge frameClk) begin
-    if (reset == 1'b1 || sigSpawn == 1'b1) begin
+    if (reset == 1'b1) begin
         bounceCount = '0;
-    else
+    end else begin
         bounceCount <= bounceCountNext;
+    end
 end
 
 always_comb begin
-    bounceCountNext = bounceCount;
-    if (sigSpawn == 1'b1)
-        bounceCountNext = '0;
-    else if (sigBounce == 1'b1)
-        bounceCountNext = bounceCount + 1;
+    case (state)
+        DEAD: bounceCountNext = '0;
+        SPAWNED: bounceCountNext = '0;
+        MOVING: bounceCountNext = bounceCount;
+        BOUNCE: bounceCountNext = bounceCount + 1;
+    endcase
 end
 
 endmodule

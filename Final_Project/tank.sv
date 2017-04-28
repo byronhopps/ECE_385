@@ -2,6 +2,7 @@ module Tank (
     input  logic frameClk, reset_h,
     input  logic moveUp, moveDown, moveLeft, moveRight,
     input  logic sigKill, sigSpawn, sigStop,
+    input  logic [3:0] playerNumber,
 
     input  logic [9:0] spawnPosX, spawnPosY,
     input  logic [9:0] pixelPosX, pixelPosY,
@@ -17,19 +18,28 @@ module Tank (
     output logic [9:0] nextPosX, nextPosY 
 );
 
+logic sigStopInt, arenaEdgeCollide;
+assign sigStopInt = arenaEdgeCollide | sigStop;
+
+// TODO: add tankStartDir input
 TankEntity tankEntity (
     .frameClk, .tankReset(reset_h),
     .moveUp, .moveDown, .moveLeft, .moveRight,
-    .sigKill, .sigSpawn, .sigStop, .tankStep,
+    .sigKill, .sigSpawn, .sigStop(sigStopInt), .tankStep,
     .tankDir, .tankExists,
     .spawnPosX, .spawnPosY,
     .curPosX, .curPosY, .nextPosX, .nextPosY
 );
 
+ArenaEdgeDetect tankEdgeDetect (
+    .posX(nextPosX), .posY(nextPosY), .radius(tankRadius),
+    .collide(arenaEdgeCollide)
+);
+
 TankMapper tankMapper (
     .tankPosX(curPosX), .tankPosY(curPosY),
+    .tankRadius, .turretWidth, .playerNumber,
     .pixelPosX, .pixelPosY,
-    .tankRadius, .turretWidth,
     .tankDir, .tankColor
 );
 
@@ -134,6 +144,7 @@ module TankMapper (
     input  logic [9:0] pixelPosX, pixelPosY,
     input  logic [7:0] tankRadius,
     input  logic [7:0] turretWidth,
+    input  logic [3:0] playerNumber,
     input  DIRECTION   tankDir,
     output COLOR       tankColor
 );
@@ -175,9 +186,21 @@ always_comb begin
         endcase
 
         if (isTurret == 1'b1) begin
-            tankColor = TURRET;
+            case (playerNumber)
+                0: tankColor = TURRET_0;
+                1: tankColor = TURRET_1;
+                2: tankColor = TURRET_2;
+                3: tankColor = TURRET_3;
+                default: tankColor = TURRET;
+            endcase
         end else begin
-            tankColor = TANK;
+            case (playerNumber)
+                0: tankColor = TANK_0;
+                1: tankColor = TANK_1;
+                2: tankColor = TANK_2;
+                3: tankColor = TANK_3;
+                default: tankColor = TANK;
+            endcase
         end
 
     end else begin

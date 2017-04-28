@@ -41,7 +41,7 @@ logic [15:0] keycode;
 logic reset_n, reset_h;
 assign reset_n = KEY[0];
 assign reset_h = ~reset_n;
-assign LEDG = 0;
+assign LEDG[0] = reset_h;
 
 parameter screenSizeX = 640;
 parameter screenSizeY = 480;
@@ -89,12 +89,12 @@ hpi_io_intf hpi_io_inst(
     .from_sw_cs(hpi_cs),
 
     // signals connected to EZ-OTG chip
-    .OTG_DATA(OTG_DATA),
-    .OTG_ADDR(OTG_ADDR),
-    .OTG_RD_N(OTG_RD_N),
-    .OTG_WR_N(OTG_WR_N),
-    .OTG_CS_N(OTG_CS_N),
-    .OTG_RST_N(OTG_RST_N)
+    .OTG_DATA,
+    .OTG_ADDR,
+    .OTG_RD_N,
+    .OTG_WR_N,
+    .OTG_CS_N,
+    .OTG_RST_N
 );
 
 // Signal for current pixel being drawn
@@ -112,7 +112,7 @@ VGA_controller vga_controller_instance(
     .DrawX(xPixel), .DrawY(yPixel)
 );
 
-logic moveUp, moveDown, moveLeft, moveRight, shoot;
+//logic moveUp, moveDown, moveLeft, moveRight, shoot;
 /* always_comb begin */
 /*     moveUp = 0;   moveDown = 0; */
 /*     moveLeft = 0; moveRight = 0; */
@@ -127,111 +127,215 @@ logic moveUp, moveDown, moveLeft, moveRight, shoot;
 /*     endcase */
 /* end */
 
-assign moveUp = SW[1];
-assign moveDown = SW[2];
-assign moveLeft = SW[3];
-assign moveRight = SW[4];
-
-logic tankExists, bulletExists;
-logic [9:0] curTankPosX, curTankPosY;
-logic [9:0] nextTankPosX, nextTankPosY;
+logic tankExists [1:0];
+logic bulletExists [1:0];
+logic tankKill [1:0];
+logic bulletKill [1:0];
+logic bulletHitTank0 [1:0]
+logic bulletHitTank1 [1:0]
+logic bulletHitBullet;
+logic [9:0] curTankPosX [1:0];
+logic [9:0] curTankPosY [1:0];
 logic [7:0] tankRadius, bulletRadius;
+
 assign tankRadius = 10;
 assign bulletRadius = 3;
+
+assign tankKill[0] = bulletHitTank0[0] | bulletHitTank0[1] | ~KEY[2];
+assign tankKill[1] = bulletHitTank1[0] | bulletHitTank1[1] | ~KEY[2];
+assign bulletKill[0] = bulletHitTank0[0] | bulletHitTank1[0] | bulletHitBullet | ~KEY[2] | ~KEY[3];
+assign bulletKill[1] = bulletHitTank0[1] | bulletHitTank1[1] | bulletHitBullet | ~KEY[2] | ~KEY[3];
+
+DIRECTION tankDir [1:0];
+COLOR tankPixelColor[1:0];
+COLOR bulletPixelColor[1:0];
 
 // Control hardware for tank 0
 Tank tank_0 (
     .frameClk, .reset_h,
-    .moveUp, .moveDown, .moveLeft, .moveRight,
-    .sigKill(~KEY[2]), .sigSpawn(~KEY[1]), .sigStop,
+    .playerNumber(0),
+    .moveUp(SW[3]), .moveDown(SW[2]), .moveLeft(SW[4]), .moveRight(SW[1]),
+    .sigKill(tankKill[0]), .sigSpawn(~KEY[1]), .sigStop(),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
     .spawnPosX(50), .spawnPosY(50),
     .tankStep(2), .tankRadius, .turretWidth(3),
-    .tankDir, .tankColor(tankPixelColor), .tankExists,
-    .curPosX(curTankPosX), .curPosY(curTankPosY), .nextPosX(nextTankPosX), .nextPosY(nextTankPosY)
+    .tankDir(tankDir[0]), .tankColor(tankPixelColor[0]), .tankExists(tankExists[0]),
+    .curPosX(curTankPosX[0]), .curPosY(curTankPosY[0]), .nextPosX(), .nextPosY()
 );
 
-logic sigStop;
-always_comb begin
-    sigStop = 0;
+// Control hardware for tank 1
+Tank tank_1 (
+    .frameClk, .reset_h,
+    .playerNumber(1),
+    .moveUp(SW[16]), .moveDown(SW[15]), .moveLeft(SW[17]), .moveRight(SW[14]),
+    .sigKill(tankKill[1]), .sigSpawn(~KEY[1]), .sigStop(),
+    .pixelPosX(xPixel), .pixelPosY(yPixel),
+    .spawnPosX(590), .spawnPosY(430),
+    .tankStep(2), .tankRadius, .turretWidth(3),
+    .tankDir(tankDir[1]), .tankColor(tankPixelColor[1]), .tankExists(tankExists[1]),
+    .curPosX(curTankPosX[1]), .curPosY(curTankPosY[1]), .nextPosX(), .nextPosY()
+);
 
-    if ((nextTankPosX <= tankRadius) || (nextTankPosX >= screenSizeX - tankRadius)) begin
-        sigStop = 1;
-    end
 
-    if ((nextTankPosY <= tankRadius) || (nextTankPosY >= screenSizeY - tankRadius)) begin
-        sigStop = 1;
-    end
-end
-
-DIRECTION tankDir;
-COLOR tankPixelColor, bulletPixelColor;
-
-logic [9:0] bulletPosX, bulletPosY;
+logic [9:0] bulletPosX [1:0];
+logic [9:0] bulletPosY [1:0];
 
 // NOTE: sigSpawn should only work when tank exists
 Bullet bullet0_0 (
     .frameClk, .reset_h,
-    // .sigSpawn(shoot)
-    .sigKill(~KEY[3]), .sigSpawn(SW[0]), .sigBounce,
-    .bulletStartDir(tankDir),
+    .sigKill(~KEY[3]), .sigSpawn(SW[0]), .sigBounce(),
+    .bulletStartDir(tankDir[0]),
     .bulletRadius,
-    .bulletStep(7), .bulletLife(2),
+    .bulletStep(7), .bulletLife(3),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
-    .bulletStartX, .bulletStartY,
-    .bulletExists,
-    .bulletPosX, .bulletPosY,
-    .bulletColor(bulletPixelColor)
+    .bulletStartX(bulletStartX[0]), .bulletStartY(bulletStartY[0]),
+    .bulletExists(bulletExists[0]),
+    .bulletPosX(bulletPosX[0]), .bulletPosY(bulletPosY[0]),
+    .bulletColor(bulletPixelColor[0])
 );
 
-logic sigBounce;
+// NOTE: sigSpawn should only work when tank exists
+Bullet bullet1_0 (
+    .frameClk, .reset_h,
+    .sigKill(~KEY[3]), .sigSpawn(SW[13]), .sigBounce(),
+    .bulletStartDir(tankDir[1]),
+    .bulletRadius,
+    .bulletStep(7), .bulletLife(3),
+    .pixelPosX(xPixel), .pixelPosY(yPixel),
+    .bulletStartX(bulletStartX[1]), .bulletStartY(bulletStartY[1]),
+    .bulletExists(bulletExists[1]),
+    .bulletPosX(bulletPosX[1]), .bulletPosY(bulletPosY[1]),
+    .bulletColor(bulletPixelColor[1])
+);
+
+// Bullet 0 from tank 0 hitting tank 0 collision detection
+EntityCollisionDetect bullet00_tank0 (
+    .posX0(curTankPosX[0]), .posY0(curTankPosY[0]),
+    .radiusX0(tankRadius), .radiusY0(tankRadius),
+    .poxX1(bulletPosX[0]), .posY1(bulletPosY[0]),
+    .radiusX1(bulletRadius), .radiusY1(bulletRadius),
+    .collide(bulletHitTank0[0])
+);
+
+// Bullet 0 from tank 1 hitting tank 0 collision detection
+EntityCollisionDetect bullet10_tank0 (
+    .posX0(curTankPosX[0]), .posY0(curTankPosY[0]),
+    .radiusX0(tankRadius), .radiusY0(tankRadius),
+    .poxX1(bulletPosX[1]), .posY1(bulletPosY[1]),
+    .radiusX1(bulletRadius), .radiusY1(bulletRadius),
+    .collide(bulletHitTank0[1])
+);
+
+// Bullet 0 from tank 0 hitting tank 1 collision detection
+EntityCollisionDetect bullet00_tank1 (
+    .posX0(curTankPosX[1]), .posY0(curTankPosY[1]),
+    .radiusX0(tankRadius), .radiusY0(tankRadius),
+    .poxX1(bulletPosX[0]), .posY1(bulletPosY[0]),
+    .radiusX1(bulletRadius), .radiusY1(bulletRadius),
+    .collide(bulletHitTank1[0])
+);
+
+// Bullet 0 from tank 1 hitting tank 1 collision detection
+EntityCollisionDetect bullet10_tank1 (
+    .posX0(curTankPosX[1]), .posY0(curTankPosY[1]),
+    .radiusX0(tankRadius), .radiusY0(tankRadius),
+    .poxX1(bulletPosX[1]), .posY1(bulletPosY[1]),
+    .radiusX1(bulletRadius), .radiusY1(bulletRadius),
+    .collide(bulletHitTank1[1])
+);
+
+// Bullet-on-bullet collision detection
+EntityCollisionDetect bullet00_bullet10 (
+    .posX0(bulletPosX[0]), .posY0(bulletPosY[0]),
+    .radiusX0(bulletRadius), .radiusY0(bulletRadius),
+    .posX1(bulletPosX[1]), .posY1(bulletPosY[1]),
+    .radiusX1(bulletRadius), .radiusY1(bulletRadius),
+    .collide(bulletHitBullet)
+);
+
+logic [9:0] bulletStartX [1:0];
+logic [9:0] bulletStartY [1:0];
+
 always_comb begin
-    sigBounce = 0;
-
-    if ((bulletPosX <= bulletRadius) || (bulletPosX >= screenSizeX - bulletRadius)) begin
-        sigBounce = 1;
-    end
-
-    if ((bulletPosY <= bulletRadius) || (bulletPosY >= screenSizeY - bulletRadius)) begin
-        sigBounce = 1;
-    end
-end
-
-logic [9:0] bulletStartX, bulletStartY;
-always_comb begin
-    case (tankDir)
+    case (tankDir[1])
         UP: begin
-            bulletStartX = curTankPosX;
-            bulletStartY = curTankPosY - tankRadius - bulletRadius;
+            bulletStartX[1] = curTankPosX[1];
+            bulletStartY[1] = curTankPosY[1] - tankRadius - bulletRadius;
         end
 
         DOWN: begin
-            bulletStartX = curTankPosX;
-            bulletStartY = curTankPosY + tankRadius + bulletRadius;
+            bulletStartX[1] = curTankPosX[1];
+            bulletStartY[1] = curTankPosY[1] + tankRadius + bulletRadius;
         end
 
         LEFT: begin
-            bulletStartX = curTankPosX - tankRadius - bulletRadius;
-            bulletStartY = curTankPosY;
+            bulletStartX[1] = curTankPosX[1] - tankRadius - bulletRadius;
+            bulletStartY[1] = curTankPosY[1];
         end
 
         RIGHT: begin
-            bulletStartX = curTankPosX + tankRadius + bulletRadius;
-            bulletStartY = curTankPosY;
+            bulletStartX[1] = curTankPosX[1] + tankRadius + bulletRadius;
+            bulletStartY[1] = curTankPosY[1];
         end
 
         default: begin
-            bulletStartX = 0;
-            bulletStartY = 0;
+            bulletStartX[1] = 0;
+            bulletStartY[1] = 0;
         end
     endcase
 end
 
+
 always_comb begin
-    if (bulletPixelColor != BACKGROUND && bulletExists) begin
-        {VGA_R, VGA_G, VGA_B} = bulletPixelColor;
-    end else if (tankExists) begin
-        {VGA_R, VGA_G, VGA_B} = tankPixelColor;
+    case (tankDir[0])
+        UP: begin
+            bulletStartX[0] = curTankPosX[0];
+            bulletStartY[0] = curTankPosY[0] - tankRadius - bulletRadius;
+        end
+
+        DOWN: begin
+            bulletStartX[0] = curTankPosX[0];
+            bulletStartY[0] = curTankPosY[0] + tankRadius + bulletRadius;
+        end
+
+        LEFT: begin
+            bulletStartX[0] = curTankPosX[0] - tankRadius - bulletRadius;
+            bulletStartY[0] = curTankPosY[0];
+        end
+
+        RIGHT: begin
+            bulletStartX[0] = curTankPosX[0] + tankRadius + bulletRadius;
+            bulletStartY[0] = curTankPosY[0];
+        end
+
+        default: begin
+            bulletStartX[0] = 0;
+            bulletStartY[0] = 0;
+        end
+    endcase
+end
+
+logic junglePixelValid;
+COLOR junglePixelColor;
+JungleTerrain (#1) jungle (
+    .frameClk, .reset_h,
+    .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(1),
+    .spawnPosX(300), .spawnPosY(200), .spawnRadiusX(100), .spawnRadiusY(200),
+    .pixelPosX(xPixel), .pixelPosY(.yPixel),
+    .pixelValid(junglePixelValid), .pixelColor(junglePixelColor)
+);
+
+always_comb begin
+    if (junglePixelValid)
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor;
+    end else if (bulletPixelColor[0] != BACKGROUND && bulletExists[0]) begin
+        {VGA_R, VGA_G, VGA_B} = bulletPixelColor[0];
+    end else if (bulletPixelColor[1] != BACKGROUND && bulletExists[1]) begin
+        {VGA_R, VGA_G, VGA_B} = bulletPixelColor[1];
+    end else if (tankPixelColor[0] != BACKGROUND && tankExists[0]) begin
+        {VGA_R, VGA_G, VGA_B} = tankPixelColor[0];
+    end else if (tankPixelColor[1] != BACKGROUND && tankExists[1]) begin
+        {VGA_R, VGA_G, VGA_B} = tankPixelColor[1];
     end else begin
         {VGA_R, VGA_G, VGA_B} = BACKGROUND;
     end
