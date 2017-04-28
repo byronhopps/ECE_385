@@ -16,14 +16,14 @@ logic sigSpawnInt, sigKillInt;
 assign sigSpawnInt = sigSpawn & (entityTerrainID == terrainID);
 assign sigKillInt = sigKill & (entityTerrainID == terrainID);
 
-enum logic {ON, OFF} state, nextState;
+enum logic {ON, OFF} state;
 
 // Next state logic
 always_ff @ (posedge frameClk) begin
     if (reset_h == 1'b1 | sigKillInt) begin
-        nextState <= OFF;
+        state <= OFF;
     end else if (sigSpawnInt) begin
-        nextState <= ON;
+        state <= ON;
     end
 end
 

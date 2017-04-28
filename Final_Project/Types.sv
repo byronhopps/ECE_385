@@ -5,6 +5,7 @@ typedef enum logic [23:0] {RED_24 = 24'hFF0000, GREEN_24 = 24'h00FF00,
 
 typedef enum logic [23:0] {
     BULLET = 24'hFFFFFF, BACKGROUND = 24'h000000,
+    JUNGLE = 24'h11FF11,
     TURRET = 24'hAAAAAA, TANK = 24'h555555,
     TURRET_0 = 24'hFF0000, TANK_0 = 24'h885555,
     TURRET_1 = 24'h00FF00, TANK_1 = 24'h558855,

@@ -100,6 +100,9 @@ always_ff @ (posedge frameClk) begin
     if (tankReset == 1'b1) begin
         curPosX <= '0;
         curPosY <= '0;
+    end else if (sigKill == 1'b1) begin
+        curPosX <= 10'd1000;
+        curPosY <= 10'd1000;
     end else if (sigSpawn == 1'b1) begin
         curPosX <= spawnPosX;
         curPosY <= spawnPosY;

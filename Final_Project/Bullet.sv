@@ -93,45 +93,31 @@ end
 
 // Logic for determining bullet position
 always_comb begin
-    nextPosX = bulletPosX;
-    nextPosY = bulletPosY;
-
-    case (state)
-        DEAD:
-        SPAWNED: begin
-            nextPosX = bulletStartX;
-            nextPosY = bulletStartY;
+    unique case (bulletDir)
+        UP: begin
+            nextPosX = bulletPosX;
+            nextPosY = bulletPosY - bulletStep;
         end
 
-        // TODO: Make this the bounce state as well?
-        MOVING: begin
-            unique case (bulletDir)
-                UP: begin
-                    nextPosX = bulletPosX;
-                    nextPosY = bulletPosY - bulletStep;
-                end
+        DOWN: begin
+            nextPosX = bulletPosX;
+            nextPosY = bulletPosY + bulletStep;
+        end
 
-                DOWN: begin
-                    nextPosX = bulletPosX;
-                    nextPosY = bulletPosY + bulletStep;
-                end
+        LEFT: begin
+            nextPosX = bulletPosX - bulletStep;
+            nextPosY = bulletPosY;
+        end
 
-                LEFT: begin
-                    nextPosX = bulletPosX - bulletStep;
-                    nextPosY = bulletPosY;
-                end
+        RIGHT: begin
+            nextPosX = bulletPosX + bulletStep;
+            nextPosY = bulletPosY;
+        end
 
-                RIGHT: begin
-                    nextPosX = bulletPosX + bulletStep;
-                    nextPosY = bulletPosY;
-                end
-
-                default: begin
-                    nextPosX = bulletPosX;
-                    nextPosY = bulletPosY;
-                    $error("Unhandled direction in bullet direction control");
-                end
-            endcase
+        default: begin
+            nextPosX = bulletPosX;
+            nextPosY = bulletPosY;
+            $error("Unhandled direction in bullet direction control");
         end
     endcase
 end
@@ -141,6 +127,12 @@ always_ff @ (posedge frameClk) begin
     if (reset == 1'b1) begin
         bulletPosX <= '0;
         bulletPosY <= '0;
+    end else if (state == SPAWNED) begin
+        bulletPosX <= bulletStartX;
+        bulletPosY <= bulletStartY;
+    end else if (state == DEAD) begin
+        bulletPosX <= 10'd100;
+        bulletPosY <= 10'd1000;
     end else begin
         bulletPosX <= nextPosX;
         bulletPosY <= nextPosY;
@@ -152,6 +144,7 @@ DIRECTION bulletDir, nextDir;
 always_comb begin
     nextDir = bulletDir;
     case (state)
+        DEAD: nextDir = bulletStartDir;
         SPAWNED: nextDir = bulletStartDir;
         MOVING: nextDir = bulletDir;
         BOUNCE: begin

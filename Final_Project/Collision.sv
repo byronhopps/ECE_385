@@ -38,17 +38,17 @@ assign collide = Xcollide & Ycollide;
 
 always_comb begin
     if (posX1 >= posX0) begin
-        Xcollide = (posX1 - posX0) <= radiusX0 + radiusX1;
+        Xcollide = ((posX1 - posX0) <= (radiusX0 + radiusX1));
     end else begin
-        Xcollide = (posX0 - posX1) <= radiusX0 + radiusX1;
+        Xcollide = ((posX0 - posX1) <= (radiusX0 + radiusX1));
     end
 end
 
 always_comb begin
     if (posY1 >= posY0) begin
-        Ycollide = (posY1 - posY0) <= radiusY0 + radiusY1;
+        Ycollide = ((posY1 - posY0) <= (radiusY0 + radiusY1));
     end else begin
-        Ycollide = (posY0 - posY1) <= radiusY0 + radiusY1;
+        Ycollide = ((posY0 - posY1) <= (radiusY0 + radiusY1));
     end
 end
 
