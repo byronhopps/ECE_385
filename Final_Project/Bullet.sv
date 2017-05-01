@@ -13,19 +13,21 @@ module Bullet (
     output COLOR       bulletColor
 );
 
-logic sigBounceInt, arenaEdgeCollide;
-assign sigBounceInt = arenaEdgeCollide | sigBounce;
+logic sigKillInt, arenaEdgeCollide;
+assign sigKillInt = (arenaEdgeCollide | sigKill) & bulletExists;
 
 BulletEntity bulletEntity (
-    .frameClk, .reset(reset_h), .sigKill, .sigSpawn,
-    .sigBounce(sigBounceInt),
+    .frameClk, .reset(reset_h), .sigKill(sigKillInt), .sigSpawn,
+    .sigBounce(),
     .bulletStartDir, .bulletStep, .bulletLife,
     .bulletStartX, .bulletStartY,
-    .bulletExists, .bulletPosX, .bulletPosY
+    .bulletExists, .bulletPosX, .bulletPosY,
+    .nextPosX, .nextPosY
 );
 
+logic [9:0] nextPosX, nextPosY;
 ArenaEdgeDetect bulletEdgeDetect (
-    .posX(bulletPosX), .posY(bulletPosY), .radius(bulletRadius),
+    .posX(nextPosX), .posY(nextPosY), .radius(bulletRadius),
     .collide(arenaEdgeCollide)
 );
 
@@ -47,11 +49,11 @@ module BulletEntity (
     input  logic [9:0]  bulletStartX, bulletStartY,
 
     output logic bulletExists,
-    output logic [9:0] bulletPosX, bulletPosY
+    output logic [9:0] bulletPosX, bulletPosY,
+    output logic [9:0] nextPosX, nextPosY
 );
 
 // Bullet movement control logic
-logic [9:0] nextPosX, nextPosY;
 
 enum logic [1:0] {DEAD, SPAWNED, MOVING, BOUNCE} state, nextState;
 
@@ -147,18 +149,21 @@ always_comb begin
         DEAD: nextDir = bulletStartDir;
         SPAWNED: nextDir = bulletStartDir;
         MOVING: nextDir = bulletDir;
-        BOUNCE: begin
-            unique case (bulletDir)
-                UP:    nextDir = DOWN;
-                DOWN:  nextDir = UP;
-                LEFT:  nextDir = RIGHT;
-                RIGHT: nextDir = LEFT;
+        BOUNCE: nextDir = bounceDir;
+    endcase
+end
 
-                default: begin
-                    nextDir = bulletDir;
-                    $error("Unhandled direction in bullet direction change logic");
-                end
-            endcase
+DIRECTION bounceDir;
+always_comb begin
+    unique case (bulletDir)
+        UP:    bounceDir = DOWN;
+        DOWN:  bounceDir = UP;
+        LEFT:  bounceDir = RIGHT;
+        RIGHT: bounceDir = LEFT;
+
+        default: begin
+            nextDir = bulletDir;
+            $error("Unhandled direction in bullet direction change logic");
         end
     endcase
 end
@@ -176,7 +181,7 @@ end
 logic [7:0] bounceCount, bounceCountNext;
 always_ff @ (posedge frameClk) begin
     if (reset == 1'b1) begin
-        bounceCount = '0;
+        bounceCount <= '0;
     end else begin
         bounceCount <= bounceCountNext;
     end
@@ -214,6 +219,46 @@ always_comb begin
     end else begin
         bulletColor = BACKGROUND;
     end
+end
+
+endmodule
+
+
+
+module BulletStartPos (
+    input  DIRECTION tankDir,
+    input  RECT      nextTankArea,
+    input  RADIUS    bulletRadius,
+    output POSITION  bulletStartPos
+);
+
+always_comb begin
+    case (tankDir)
+        UP: begin
+            bulletStartPos.x = nextTankArea.center.x;
+            bulletStartPos.y = nextTankArea.center.y - nextTankArea.radius.y - bulletRadius.y - 8'd1;
+        end
+
+        DOWN: begin
+            bulletStartPos.x = nextTankArea.center.x;
+            bulletStartPos.y = nextTankArea.center.y + nextTankArea.radius.y + bulletRadius.y + 8'd1;
+        end
+
+        LEFT: begin
+            bulletStartPos.x = nextTankArea.center.x - nextTankArea.radius.x - bulletRadius.x - 8'd1;
+            bulletStartPos.y = nextTankArea.center.y;
+        end
+
+        RIGHT: begin
+            bulletStartPos.x = nextTankArea.center.x + nextTankArea.radius.x + bulletRadius.x + 8'd1;
+            bulletStartPos.y = nextTankArea.center.y;
+        end
+
+        default: begin
+            bulletStartPos.x = 0;
+            bulletStartPos.y = 0;
+        end
+    endcase
 end
 
 endmodule

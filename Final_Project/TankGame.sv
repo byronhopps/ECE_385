@@ -46,6 +46,8 @@ assign LEDG[0] = reset_h;
 parameter screenSizeX = 640;
 parameter screenSizeY = 480;
 
+logic [7:0] tankControl [2];
+
 TankGame_soc soc (
     .clk_clk(CLOCK_50),
     .reset_reset_n(reset_n),
@@ -65,10 +67,15 @@ TankGame_soc soc (
     .otg_hpi_cs_export(hpi_cs),
     .otg_hpi_r_export(hpi_r),
     .otg_hpi_w_export(hpi_w),
-    .keycode_export(keycode),
-    .button_wire_export(),
+    .button_wire_export(KEY),
     .led_wire_export(),
-    .switch_wire_export()
+    .switch_wire_export(SW),
+    .game_control_export(  ),
+    .game_status_export (   ),
+    .tank_control_export({tankControl[1], tankControl[0]}),
+    .terrain_id_export(    ),
+    .terrain_signal_export(   ),
+    .terrain_spawn_export(  )
 );
 
 logic [1:0] hpi_addr;
@@ -98,7 +105,11 @@ hpi_io_intf hpi_io_inst(
 );
 
 // Signal for current pixel being drawn
-logic [9:0] xPixel, yPixel;
+POSITION pixelPos;
+logic  [9:0] xPixel, yPixel;
+assign xPixel = pixelPos.x;
+assign yPixel = pixelPos.y;
+
 logic frameClk;
 assign frameClk = VGA_VS;
 
@@ -109,23 +120,8 @@ VGA_controller vga_controller_instance(
     .VGA_CLK,
     .VGA_BLANK_N,
     .VGA_SYNC_N,
-    .DrawX(xPixel), .DrawY(yPixel)
+    .DrawX(pixelPos.x), .DrawY(pixelPos.y)
 );
-
-//logic moveUp, moveDown, moveLeft, moveRight, shoot;
-/* always_comb begin */
-/*     moveUp = 0;   moveDown = 0; */
-/*     moveLeft = 0; moveRight = 0; */
-/*     shoot = 0; */
-/*     case (keycode) */
-/*         26: moveUp = 1; */
-/*         22: moveDown = 1; */
-/*         04: moveLeft = 1; */
-/*         07: moveRight = 1; */
-/*         44: shoot = 1; */
-/*         default: begin end */
-/*     endcase */
-/* end */
 
 logic tankExists [1:0];
 logic bulletExists [1:0];
@@ -147,31 +143,67 @@ logic [7:0] tankRadius, bulletRadius;
 assign tankRadius = 10;
 assign bulletRadius = 3;
 
-assign LEDG[1] = tankKill[0];
-assign LEDG[2] = bulletHitTank0[0];
-assign LEDG[3] = bulletHitTank0[1];
-
-assign bulletHitTank0[0] = bulletCollideTank0[0] & bulletExists[0];
-assign bulletHitTank0[1] = bulletCollideTank0[1] & bulletExists[1];
-assign bulletHitTank1[0] = bulletCollideTank1[0] & bulletExists[0];
-assign bulletHitTank1[1] = bulletCollideTank1[1] & bulletExists[1];
-
-assign tankKill[0] = bulletHitTank0[0] | bulletHitTank0[1] | ~KEY[2];
-assign tankKill[1] = bulletHitTank1[0] | bulletHitTank1[1] | ~KEY[2];
-
-assign bulletKill[0] = bulletHitTank0[0] | bulletHitTank1[0] | bulletHitBullet | ~KEY[2] | ~KEY[3];
-assign bulletKill[1] = bulletHitTank0[1] | bulletHitTank1[1] | bulletHitBullet | ~KEY[2] | ~KEY[3];
+RADIUS tankRadiusPos;
+assign tankRadiusPos.x = tankRadius;
+assign tankRadiusPos.y = tankRadius;
 
 DIRECTION tankDir [1:0];
 COLOR tankPixelColor[1:0];
 COLOR bulletPixelColor[1:0];
 
+POSITION curTankPos [2];
+assign curTankPos[0].x = curTankPosX[0];
+assign curTankPos[1].x = curTankPosX[1];
+assign curTankPos[0].y = curTankPosY[0];
+assign curTankPos[1].y = curTankPosY[1];
+
+RECT curTankEntity [2];
+assign curTankEntity[0].center = curTankPos[0];
+assign curTankEntity[1].center = curTankPos[1];
+assign curTankEntity[0].radius = tankRadiusPos;
+assign curTankEntity[1].radius = tankRadiusPos;
+
+POSITION nextTankPos [2];
+assign nextTankPos[0].x = nextTankPosX[0];
+assign nextTankPos[1].x = nextTankPosX[1];
+assign nextTankPos[0].y = nextTankPosY[0];
+assign nextTankPos[1].y = nextTankPosY[1];
+
+RECT nextTankEntity [2];
+assign nextTankEntity[0].center = nextTankPos[0];
+assign nextTankEntity[1].center = nextTankPos[1];
+assign nextTankEntity[0].radius = tankRadiusPos;
+assign nextTankEntity[1].radius = tankRadiusPos;
+
+parameter numTanks = 2;
+
+assign tankKill[0] = bulletHitTank0.or() | ~KEY[2];
+assign tankKill[1] = bulletHitTank1.or() | ~KEY[2];
+
+// Assumed to be 1 in most of the game logic
+parameter bulletsPerTank = 1;
+
+logic sigStop[numTanks];
+
+generate
+    for (i = 0; i < numTanks; i = i + 1) begin : tankSignalAssignment
+        assign sigStop[i] = tankTankCollide | tankWallCollide[i] | tankHitWater[i];
+
+        assign bulletHitTank0[i] = bulletCollideTank0[i] & bulletExists[i];
+        assign bulletHitTank1[i] = bulletCollideTank1[i] & bulletExists[i];
+
+        assign bulletKill[i] = bulletHitTank0[i] | bulletHitTank1[i]
+            | bulletHitWall[i] | bulletHitBullet | ~KEY[2] | ~KEY[3];
+    end
+endgenerate
+
 // Control hardware for tank 0
 Tank tank_0 (
     .frameClk, .reset_h,
     .playerNumber(0),
-    .moveUp(SW[3]), .moveDown(SW[2]), .moveLeft(SW[4]), .moveRight(SW[1]),
-    .sigKill(tankKill[0]), .sigSpawn(~KEY[1]), .sigStop(),
+    .moveUp(tankControl[0][2]), .moveDown(tankControl[0][1]),
+    .moveLeft(tankControl[0][3]), .moveRight(tankControl[0][0]),
+    .sigKill(tankKill[0]), .sigSpawn(~KEY[1]), .sigStop(sigStop[0]),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
     .spawnPosX(50), .spawnPosY(50),
     .tankStep(2), .tankRadius, .turretWidth(3),
@@ -183,8 +215,9 @@ Tank tank_0 (
 Tank tank_1 (
     .frameClk, .reset_h,
     .playerNumber(1),
-    .moveUp(SW[16]), .moveDown(SW[15]), .moveLeft(SW[17]), .moveRight(SW[14]),
-    .sigKill(tankKill[1]), .sigSpawn(~KEY[1]), .sigStop(),
+    .moveUp(tankControl[1][2]), .moveDown(tankControl[1][1]),
+    .moveLeft(tankControl[1][3]), .moveRight(tankControl[1][0]),
+    .sigKill(tankKill[1]), .sigSpawn(~KEY[1]), .sigStop(sigStop[1]),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
     .spawnPosX(590), .spawnPosY(430),
     .tankStep(2), .tankRadius, .turretWidth(3),
@@ -196,10 +229,29 @@ Tank tank_1 (
 logic [9:0] bulletPosX [1:0];
 logic [9:0] bulletPosY [1:0];
 
+POSITION bulletPos [numTanks];
+RECT    bulletArea [numTanks];
+generate
+    for (i = 0; i < numTanks; i = i + 1) begin : bulletPosAssignment
+        assign bulletPos[i].x = bulletPosX[i];
+        assign bulletPos[i].y = bulletPosY[i];
+
+        assign bulletArea[i].center = bulletPos[i];
+        assign bulletArea[i].radius = '{bulletRadius, bulletRadius};
+    end
+endgenerate
+
+logic bulletSpawn [numTanks];
+generate
+    for (i = 0; i < numTanks; i = i + 1) begin : bulletSpawnGeneration
+        assign bulletSpawn[i] = tankControl[i][4] & tankExists[i];
+    end
+endgenerate
+
 // NOTE: sigSpawn should only work when tank exists
 Bullet bullet0_0 (
     .frameClk, .reset_h,
-    .sigKill(bulletKill[0]), .sigSpawn(SW[0]), .sigBounce(),
+    .sigKill(bulletKill[0]), .sigSpawn(bulletSpawn[0]), .sigBounce(),
     .bulletStartDir(tankDir[0]),
     .bulletRadius,
     .bulletStep(7), .bulletLife(3),
@@ -213,7 +265,7 @@ Bullet bullet0_0 (
 // NOTE: sigSpawn should only work when tank exists
 Bullet bullet1_0 (
     .frameClk, .reset_h,
-    .sigKill(bulletKill[1]), .sigSpawn(SW[13]), .sigBounce(),
+    .sigKill(bulletKill[1]), .sigSpawn(bulletSpawn[1]), .sigBounce(),
     .bulletStartDir(tankDir[1]),
     .bulletRadius,
     .bulletStep(7), .bulletLife(3),
@@ -269,85 +321,138 @@ EntityCollisionDetect bullet00_bullet10 (
     .collide(bulletHitBullet)
 );
 
+logic tankTankCollide;
+DetectCollision tank0_tank1 (
+    .A(nextTankEntity[0]), .B(nextTankEntity[1]),
+    .collision(tankTankCollide)
+);
+
+
 logic [9:0] bulletStartX [1:0];
 logic [9:0] bulletStartY [1:0];
 
-always_comb begin
-    case (tankDir[1])
-        UP: begin
-            bulletStartX[1] = nextTankPosX[1];
-            bulletStartY[1] = nextTankPosY[1] - tankRadius - bulletRadius - 1;
-        end
-
-        DOWN: begin
-            bulletStartX[1] = nextTankPosX[1];
-            bulletStartY[1] = nextTankPosY[1] + tankRadius + bulletRadius + 1;
-        end
-
-        LEFT: begin
-            bulletStartX[1] = nextTankPosX[1] - tankRadius - bulletRadius - 1;
-            bulletStartY[1] = nextTankPosY[1];
-        end
-
-        RIGHT: begin
-            bulletStartX[1] = nextTankPosX[1] + tankRadius + bulletRadius + 1;
-            bulletStartY[1] = nextTankPosY[1];
-        end
-
-        default: begin
-            bulletStartX[1] = 0;
-            bulletStartY[1] = 0;
-        end
-    endcase
-end
-
-
-always_comb begin
-    case (tankDir[0])
-        UP: begin
-            bulletStartX[0] = nextTankPosX[0];
-            bulletStartY[0] = nextTankPosY[0] - tankRadius - bulletRadius - 1;
-        end
-
-        DOWN: begin
-            bulletStartX[0] = nextTankPosX[0];
-            bulletStartY[0] = nextTankPosY[0] + tankRadius + bulletRadius + 1;
-        end
-
-        LEFT: begin
-            bulletStartX[0] = nextTankPosX[0] - tankRadius - bulletRadius - 1;
-            bulletStartY[0] = nextTankPosY[0];
-        end
-
-        RIGHT: begin
-            bulletStartX[0] = nextTankPosX[0] + tankRadius + bulletRadius + 1;
-            bulletStartY[0] = nextTankPosY[0];
-        end
-
-        default: begin
-            bulletStartX[0] = 0;
-            bulletStartY[0] = 0;
-        end
-    endcase
-end
+generate
+    for (i = 0; i < numTanks; i = i + 1) begin : bulletStartPosGeneration
+        BulletStartPos bullet1Start (
+            .tankDir(tankDir[i]), .nextTankArea(nextTankEntity[i]),
+            .bulletRadius(bulletArea[i].radius), .bulletStartPos('{bulletStartX[i], bulletStartY[i]})
+        );
+    end
+endgenerate
 
 logic junglePixelValid;
 COLOR junglePixelColor;
+RECT  jungleSpawn;
+assign jungleSpawn = '{center:'{300,200}, radius:'{50,70}};
 JungleTerrain #(1) jungle (
     .frameClk, .reset_h,
     .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(1),
-    .spawnPosX(300), .spawnPosY(200), .spawnRadiusX(100), .spawnRadiusY(200),
-    .pixelPosX(xPixel), .pixelPosY(yPixel),
+    .spawnArea(jungleSpawn),
+    .pixelPos,
     .pixelValid(junglePixelValid), .pixelColor(junglePixelColor)
 );
 
+parameter numWalls = 4;
+parameter numWater = 2;
+
+logic wallPixelValid  [numWalls];
+logic waterPixelValid [numWater];
+
+COLOR wallPixelColor  [numWalls];
+COLOR waterPixelColor [numWater];
+
+logic wallExists  [numWalls];
+logic waterExists [numWater];
+
+RECT wallSpawn  [numWalls];
+RECT waterSpawn [numWater];
+
+RECT wallArea  [numWalls];
+RECT waterArea [numWater];
+
+parameter logic [7:0] wallTerrainID  [numWalls] = '{10,11,12,13};
+parameter logic [7:0] waterTerrainID [numWater] = '{20,21};
+
+assign wallSpawn = '{
+    '{center:'{144,104}, radius:'{8,20}},
+    '{center:'{336,224}, radius:'{8,20}},
+    '{center:'{496,320}, radius:'{8,20}},
+    '{center:'{144,320}, radius:'{8,20}}
+};
+
+assign waterSpawn = '{
+    '{center:'{520,180}, radius:'{30,20}},
+    '{center:'{320,320}, radius:'{40,25}}
+};
+
+generate
+    genvar i;
+    for (i = 0; i < numWalls; i = i + 1) begin : wallGeneration
+        WallTerrain #(wallTerrainID[i]) wallTerrain (
+            .frameClk, .reset_h,
+            .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(wallTerrainID[i]),
+            .spawnArea(wallSpawn[i]), .pixelPos,
+            .pixelValid(wallPixelValid[i]), .pixelColor(wallPixelColor[i]),
+            .wallExists(wallExists[i]), .wallArea(wallArea[i])
+        );
+    end
+
+    for (i = 0; i < numWater; i = i + 1) begin : waterGeneration
+        WaterTerrain #(waterTerrainID[i]) waterTerrain (
+            .frameClk, .reset_h,
+            .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(waterTerrainID[i]),
+            .spawnArea(waterSpawn[i]), .pixelPos, .waterArea(waterArea[i]),
+            .waterExists(waterExists[i]), .pixelValid(waterPixelValid[i]),
+            .pixelColor(waterPixelColor[i])
+        );
+    end
+
+    logic tankWallCollide [numTanks];
+    logic bulletHitWall   [numTanks];
+    logic tankHitWater    [numTanks];
+
+    for (i = 0; i < numTanks; i = i + 1) begin : tankWallCollisionGeneration
+        ObstacleCollisionDetect #(numWalls) tankOnWall (
+            .sysClk(CLOCK_50), .frameClk, .reset_h,
+            .entityArea(nextTankEntity[i]), .obstacleArea(wallSpawn),
+            .obstacleExists(wallExists),
+            .sigCollide(tankWallCollide[i]), .done()
+        );
+
+        ObstacleCollisionDetect #(numWater) tankOnWater (
+            .sysClk(CLOCK_50), .frameClk, .reset_h,
+            .entityArea(nextTankEntity[i]), .obstacleArea(waterArea),
+            .obstacleExists(waterExists),
+            .sigCollide(tankHitWater[i]), .done()
+        );
+
+        ObstacleCollisionDetect #(numWalls) bulletOnWall (
+            .sysClk(CLOCK_50), .frameClk, .reset_h,
+            .entityArea(bulletArea[i]), .obstacleArea(wallSpawn),
+            .obstacleExists(wallExists), .sigCollide(bulletHitWall[i]), .done()
+        );
+    end
+endgenerate
+
 always_comb begin
-    if (junglePixelValid) begin
+    if (wallPixelValid[0]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[0];
+    end else if (wallPixelValid[1]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[1];
+    end else if (wallPixelValid[2]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[2];
+    end else if (wallPixelValid[3]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[3];
+    end else if (junglePixelValid) begin
         {VGA_R, VGA_G, VGA_B} = junglePixelColor;
     end else if (bulletPixelColor[0] != BACKGROUND && bulletExists[0]) begin
         {VGA_R, VGA_G, VGA_B} = bulletPixelColor[0];
     end else if (bulletPixelColor[1] != BACKGROUND && bulletExists[1]) begin
         {VGA_R, VGA_G, VGA_B} = bulletPixelColor[1];
+    end else if (waterPixelValid[0]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[0];
+    end else if (waterPixelValid[1]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[1];
     end else if (tankPixelColor[0] != BACKGROUND && tankExists[0]) begin
         {VGA_R, VGA_G, VGA_B} = tankPixelColor[0];
     end else if (tankPixelColor[1] != BACKGROUND && tankExists[1]) begin

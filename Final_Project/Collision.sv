@@ -84,11 +84,11 @@ end
 endmodule
 
 
-module multipleEntityCollisionDetect_pleaseRename (
+module ObstacleCollisionDetect (
     input  logic  sysClk, frameClk, reset_h,
-    input  RECT   entityPos,
-    input  RECT   obstablePos [n],
-    input  logic  obstableExists [n],
+    input  RECT   entityArea,
+    input  RECT   obstacleArea [n],
+    input  logic  obstacleExists [n],
     output logic  sigCollide, done
 );
 
@@ -97,15 +97,15 @@ parameter n = -1;
 assign sigCollide = done & results.or();
 
 logic collision;
-DetectCollision collisionDetector (.A(entityPos), .B(obstablePos[idx]), .collision);
+DetectCollision collisionDetector (.A(entityArea), .B(obstacleArea[idx]), .collision);
 
 // Storage array to store detection results
 logic results [n];
 always_ff @ (posedge (sysClk)) begin
     if (reset_h == 1'b1) begin
-        results <= '0;
+        results <= '{default:0};
     end else begin
-        results[idx] <= collision & obstableExists[idx];
+        results[idx] <= collision & obstacleExists[idx];
     end
 end
 
@@ -113,30 +113,45 @@ end
 // Counts once per frame clock cycle
 // Used to generate array indices
 logic [$clog2(n):0] idx, idxNext;
-assign idxNext = (idx == n) ? idx : idx + 1'd1;
+assign idxNext = (idx == n-1) ? idx : idx + 1'd1;
 
 // Update index on edge of system clock
 always_ff @ (posedge sysClk) begin
-    if (reset_h == 1'b1) begin
+    if (reset_h == 1'b1 || fClkRose) begin
         idx <= '0;
     end else begin
         idx <= idxNext;
     end
 end
 
-// Internal register that stores the status of the collision checker
-logic doneNext;
-assign doneNext = (idx == n);
+logic fClkRose;
+RisingEdgeDetect fClkPosEdge (
+    .clk(sysClk), .reset_h,
+    .sig(frameClk), .posEdge(fClkRose)
+);
 
 // Ensure that the module will have time to finish
 assert property ($rose(frameClk) |=> done);
+assign done = (idx == n-1);
 
-always_ff @ (posedge frameClk) begin
-    if (reset_h == 1'b1) begin
-        done <= '0;
-    end else begin
-        done <= doneNext;
-    end
-end
+endmodule
+
+
+
+module PointWithinArea (
+    input  POSITION pos,
+    input  RECT     area,
+    output logic    overlap
+);
+
+logic xOverlap, yOverlap;
+
+assign xOverlap = (area.center.x - area.radius.x <= pos.x
+                && pos.x <= area.center.x + area.radius.x);
+
+assign yOverlap = (area.center.y - area.radius.y <= pos.y
+                && pos.y <= area.center.y + area.radius.y);
+
+assign overlap = xOverlap & yOverlap;
 
 endmodule
