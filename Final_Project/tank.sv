@@ -125,17 +125,13 @@ always_ff @ (posedge frameClk) begin
 end
 
 always_ff @ (posedge frameClk) begin
-    unique casez({tankReset, sigSpawn, sigKill})
-        3'b1??: tankExists <= 1'b0;
-        3'b010: tankExists <= 1'b1;
-        3'b001: tankExists <= 1'b0;
-        3'b000: tankExists <= tankExists;
-
-        3'b011: begin
-            tankExists <= 1'b0;
-            $error("Tank spawned and killed at the same time");
-        end
-    endcase
+    if (tankReset == 1'b1 || sigKill) begin
+        tankExists <= '0;
+    end else if (sigSpawn) begin
+        tankExists <= '1;
+    end else begin
+        tankExists <= tankExists;
+    end
 end
 
 endmodule

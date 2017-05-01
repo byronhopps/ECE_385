@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Apr 30, 2017 9:29:54 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1493605794167</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>May 1, 2017 5:39:20 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1493678360202</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>G:\ECE_385\Final_Project\software\tankGame_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\TankGame_soc.sopcinfo</SopcDesignFile>
@@ -977,7 +977,7 @@
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>terrain_spawn</slaveDescriptor>
+                <slaveDescriptor>terrain_spawn_pos</slaveDescriptor>
                 <addressRange>0x00000100 - 0x0000010F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
@@ -991,6 +991,24 @@
         <MemoryMap>
                 <slaveDescriptor>terrain_signal</slaveDescriptor>
                 <addressRange>0x00000120 - 0x0000012F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>terrain_spawn_radius</slaveDescriptor>
+                <addressRange>0x00000130 - 0x0000013F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>tank_0_spawn_pos</slaveDescriptor>
+                <addressRange>0x00000140 - 0x0000014F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>tank_1_spawn_pos</slaveDescriptor>
+                <addressRange>0x00000150 - 0x0000015F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>

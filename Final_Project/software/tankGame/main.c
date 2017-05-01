@@ -51,6 +51,7 @@ int main(void)
 	static alt_u16 no_device = 0;
 	alt_u16 fs_device = 0;
 	int keycode[6] = {0};
+	int modifierKeys = 0;
 	alt_u8 toggle = 0;
 	alt_u8 data_size;
 	alt_u8 hot_plug_count;
@@ -519,7 +520,10 @@ int main(void)
 		// packet starts from 0x051c
                 // Second byte of packet is at 0x051d, and contains modifier bits
                 // Third, forth, and fifth bytes contain the six keycode values
-		IO_write(HPI_ADDR,0x051e); //the start address
+                IO_write(HPI_ADDR,0x051d);
+                modifierKeys = IO_read(HPI_DATA);
+
+		IO_write(HPI_ADDR,0x051e); // Start address of keycode data
 		keycode[0] = IO_read(HPI_DATA);
 		keycode[1] = (keycode[0] & 0xFF00) >> 8;
                 keycode[0] &= 0x00FF;
@@ -532,7 +536,7 @@ int main(void)
 		keycode[5] = (keycode[4] & 0xFF00) >> 8;
                 keycode[4] &= 0x00FF;
 
-                setTankControls(keycode);
+                processGameState(keycode, modifierKeys);
 
 		usleep(200);//usleep(5000);
 		usb_ctl_val = UsbRead(ctl_reg);
@@ -548,6 +552,7 @@ int main(void)
 			}
 			if(!(usb_ctl_val & no_device))
 			{
+				processKeyboardRemoval();
 				printf("\n[INFO]: the keyboard has been removed!!! \n");
 				printf("[INFO]: please insert again!!! \n");
 			}

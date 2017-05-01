@@ -1,5 +1,5 @@
 module JungleTerrain (
-    input  logic frameClk, reset_h,
+    input  logic clk, reset_h,
     input  logic sigSpawn, sigKill,
     input  logic [7:0] terrainID,
     input  RECT  spawnArea,
@@ -14,7 +14,7 @@ parameter entityTerrainID = 0;
 RECT curArea;
 logic entityValid;
 EntityCore #(entityTerrainID) jungleEntityCore (
-    .frameClk, .reset_h,
+    .clk, .reset_h,
     .sigSpawn, .sigKill,
     .terrainID, .entityValid,
     .spawnArea, .curArea
@@ -34,7 +34,7 @@ always_comb begin
     if (entityValid && pixelInArea) begin
 
         // Paint the jungle as an array of 2x2 boxes
-        if (pixelPos.x[0] == pixelPos.y[0]) begin
+        if (pixelPos.x[1] == pixelPos.y[1]) begin
             pixelColor = JUNGLE_1;
             pixelValid = 1;
         end else begin
@@ -49,7 +49,7 @@ endmodule
 
 
 module WallTerrain (
-    input  logic frameClk, reset_h,
+    input  logic clk, reset_h,
     input  logic sigSpawn, sigKill,
     input  logic [7:0] terrainID,
     input  RECT  spawnArea,
@@ -66,7 +66,7 @@ parameter entityTerrainID = 0;
 RECT curArea;
 logic entityValid;
 EntityCore #(entityTerrainID) wallEntityCore (
-    .frameClk, .reset_h,
+    .clk, .reset_h,
     .sigSpawn, .sigKill,
     .terrainID, .entityValid(wallExists),
     .spawnArea, .curArea(wallArea)
@@ -104,7 +104,7 @@ endmodule
 
 
 module WaterTerrain (
-    input  logic frameClk, reset_h,
+    input  logic clk, reset_h,
     input  logic sigSpawn, sigKill,
     input  logic [7:0] terrainID,
     input  RECT  spawnArea,
@@ -121,7 +121,7 @@ parameter entityTerrainID = 0;
 RECT curArea;
 logic entityValid;
 EntityCore #(entityTerrainID) waterEntityCore (
-    .frameClk, .reset_h,
+    .clk, .reset_h,
     .sigSpawn, .sigKill,
     .terrainID, .entityValid(waterExists),
     .spawnArea, .curArea(waterArea)
@@ -146,8 +146,9 @@ end
 
 endmodule
 module EntityCore (
-    input  logic frameClk, reset_h,
+    input  logic clk, reset_h,
     input  logic sigSpawn, sigKill,
+    input  logic sigLoad,
     input  logic [7:0] terrainID,
     input  RECT  spawnArea,
     output RECT  curArea,
@@ -158,15 +159,14 @@ parameter entityTerrainID = 0;
 
 assign entityValid = (state == ON);
 
-logic sigSpawnInt, sigKillInt;
+logic sigSpawnInt;
 assign sigSpawnInt = sigSpawn & (entityTerrainID == terrainID);
-assign sigKillInt = sigKill & (entityTerrainID == terrainID);
 
 enum logic {ON, OFF} state;
 
 // Next state logic
-always_ff @ (posedge frameClk) begin
-    if (reset_h == 1'b1 | sigKillInt) begin
+always_ff @ (posedge clk) begin
+    if (reset_h == 1'b1 | sigKill) begin
         state <= OFF;
     end else if (sigSpawnInt) begin
         state <= ON;
@@ -174,7 +174,7 @@ always_ff @ (posedge frameClk) begin
 end
 
 // Location load logic
-always_ff @ (posedge frameClk) begin
+always_ff @ (posedge clk) begin
     if (reset_h == 1'b1) begin
         curArea <= '{center:'{0,0}, radius:'{0,0}};
     end else if (sigSpawnInt) begin

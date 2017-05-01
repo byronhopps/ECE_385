@@ -2,7 +2,8 @@ module TankGame (
     input               CLOCK_50,
     input        [3:0]  KEY,          //bit 0 is set up as Reset
     input  logic [17:0] SW,
-    output logic [7:0]  LEDG,
+    output logic [8:0]  LEDG,
+    output logic [17:0] LEDR,
 
     // VGA Interface
     output logic [7:0]  VGA_R,        //VGA Red
@@ -41,7 +42,7 @@ logic [15:0] keycode;
 logic reset_n, reset_h;
 assign reset_n = KEY[0];
 assign reset_h = ~reset_n;
-assign LEDG[0] = reset_h;
+assign LEDG[8] = reset_h;
 
 parameter screenSizeX = 640;
 parameter screenSizeY = 480;
@@ -70,19 +71,48 @@ TankGame_soc soc (
     .button_wire_export(KEY),
     .led_wire_export(),
     .switch_wire_export(SW),
-    .game_control_export(  ),
-    .game_status_export (   ),
+    .game_control_export(swGameControl),
+    .game_status_export ({14'b0, tankExists[1], tankExists[0]}),
     .tank_control_export({tankControl[1], tankControl[0]}),
-    .terrain_id_export(    ),
-    .terrain_signal_export(   ),
-    .terrain_spawn_export(  )
+    .terrain_id_export(swTerrainID),
+    .terrain_spawn_pos_export(swTerrainSpawnPos),
+    .terrain_spawn_radius_export(swTerrainSpawnRadius),
+    .tank_0_spawn_pos_export(swTank0SpawnPos),
+    .tank_1_spawn_pos_export(swTank1SpawnPos)
 );
 
+// SW-HW game interface signals
+logic [15:0] swGameControl;
+logic terrainSigSpawn, terrainSigKill, tankSigSpawn, tankSigKill;
+logic bulletSigKill, sigPause;
+assign tankSigSpawn    = swGameControl[0];
+assign tankSigKill     = swGameControl[1];
+assign bulletSigKill   = swGameControl[1];
+assign terrainSigSpawn = swGameControl[2];
+assign terrainSigKill  = swGameControl[3];
+assign sigPause        = swGameControl[8];
+
+
+logic [31:0] swTank0SpawnPos, swTank1SpawnPos;
+POSITION tankSpawnPos[2];
+assign tankSpawnPos[0].x = swTank0SpawnPos[ 9: 0];
+assign tankSpawnPos[0].y = swTank0SpawnPos[25:16];
+assign tankSpawnPos[1].x = swTank1SpawnPos[ 9: 0];
+assign tankSpawnPos[1].y = swTank1SpawnPos[25:16];
+
+logic [7:0] swTerrainID;
+
+RECT terrainSpawnArea;
+logic [31:0] swTerrainSpawnPos, swTerrainSpawnRadius;
+assign terrainSpawnArea.center = '{x:swTerrainSpawnPos[9:0],    y:swTerrainSpawnPos[25:16]};
+assign terrainSpawnArea.radius = '{x:swTerrainSpawnRadius[9:0], y:swTerrainSpawnRadius[25:16]};
+
+
+// Interface between NIOS II and EZ-OTG chip
 logic [1:0] hpi_addr;
 logic [15:0] hpi_data_in, hpi_data_out;
 logic hpi_r, hpi_w,hpi_cs;
 
-// Interface between NIOS II and EZ-OTG chip
 hpi_io_intf hpi_io_inst(
     .Clk(CLOCK_50),
     .Reset(reset_h),
@@ -111,7 +141,7 @@ assign xPixel = pixelPos.x;
 assign yPixel = pixelPos.y;
 
 logic frameClk;
-assign frameClk = VGA_VS;
+assign frameClk = (sigPause | SW[0]) ? 1'b0 : VGA_VS;
 
 // Main VGA controller for design
 VGA_controller vga_controller_instance(
@@ -129,6 +159,9 @@ logic tankKill [1:0];
 logic bulletKill [1:0];
 logic bulletHitTank0 [1:0];
 logic bulletHitTank1 [1:0];
+
+assign LEDR = {18{tankExists[0]}};
+assign LEDG[7:0] = {8{tankExists[1]}};
 
 logic bulletCollideTank0[1:0];
 logic bulletCollideTank1[1:0];
@@ -177,8 +210,11 @@ assign nextTankEntity[1].radius = tankRadiusPos;
 
 parameter numTanks = 2;
 
-assign tankKill[0] = bulletHitTank0.or() | ~KEY[2];
-assign tankKill[1] = bulletHitTank1.or() | ~KEY[2];
+assign tankKill[0] = bulletHitTank0.or() | tankSigKill | ~KEY[2];
+assign tankKill[1] = bulletHitTank1.or() | tankSigKill | ~KEY[2];
+
+logic tankSpawn;
+assign tankSpawn = tankSigSpawn | ~KEY[1];
 
 // Assumed to be 1 in most of the game logic
 parameter bulletsPerTank = 1;
@@ -192,8 +228,8 @@ generate
         assign bulletHitTank0[i] = bulletCollideTank0[i] & bulletExists[i];
         assign bulletHitTank1[i] = bulletCollideTank1[i] & bulletExists[i];
 
-        assign bulletKill[i] = bulletHitTank0[i] | bulletHitTank1[i]
-            | bulletHitWall[i] | bulletHitBullet | ~KEY[2] | ~KEY[3];
+        assign bulletKill[i] = bulletHitTank0[i] | bulletHitTank1[i] | tankSpawn |
+            | bulletHitWall[i] | bulletHitBullet | bulletSigKill | ~KEY[2];
     end
 endgenerate
 
@@ -203,9 +239,9 @@ Tank tank_0 (
     .playerNumber(0),
     .moveUp(tankControl[0][2]), .moveDown(tankControl[0][1]),
     .moveLeft(tankControl[0][3]), .moveRight(tankControl[0][0]),
-    .sigKill(tankKill[0]), .sigSpawn(~KEY[1]), .sigStop(sigStop[0]),
+    .sigKill(tankKill[0]), .sigSpawn(tankSpawn), .sigStop(sigStop[0]),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
-    .spawnPosX(50), .spawnPosY(50),
+    .spawnPosX(tankSpawnPos[0].x), .spawnPosY(tankSpawnPos[0].y),
     .tankStep(2), .tankRadius, .turretWidth(3),
     .tankDir(tankDir[0]), .tankColor(tankPixelColor[0]), .tankExists(tankExists[0]),
     .curPosX(curTankPosX[0]), .curPosY(curTankPosY[0]), .nextPosX(nextTankPosX[0]), .nextPosY(nextTankPosY[0])
@@ -217,9 +253,9 @@ Tank tank_1 (
     .playerNumber(1),
     .moveUp(tankControl[1][2]), .moveDown(tankControl[1][1]),
     .moveLeft(tankControl[1][3]), .moveRight(tankControl[1][0]),
-    .sigKill(tankKill[1]), .sigSpawn(~KEY[1]), .sigStop(sigStop[1]),
+    .sigKill(tankKill[1]), .sigSpawn(tankSpawn), .sigStop(sigStop[1]),
     .pixelPosX(xPixel), .pixelPosY(yPixel),
-    .spawnPosX(590), .spawnPosY(430),
+    .spawnPosX(tankSpawnPos[1].x), .spawnPosY(tankSpawnPos[1].y),
     .tankStep(2), .tankRadius, .turretWidth(3),
     .tankDir(tankDir[1]), .tankColor(tankPixelColor[1]), .tankExists(tankExists[1]),
     .curPosX(curTankPosX[1]), .curPosY(curTankPosY[1]), .nextPosX(nextTankPosX[1]), .nextPosY(nextTankPosY[1])
@@ -345,11 +381,10 @@ COLOR junglePixelColor;
 RECT  jungleSpawn;
 assign jungleSpawn = '{center:'{300,200}, radius:'{50,70}};
 JungleTerrain #(1) jungle (
-    .frameClk, .reset_h,
-    .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(1),
-    .spawnArea(jungleSpawn),
-    .pixelPos,
-    .pixelValid(junglePixelValid), .pixelColor(junglePixelColor)
+    .clk(CLOCK_50), .reset_h,
+    .sigSpawn(terrainSigSpawn), .sigKill(terrainSigKill),
+    .terrainID(swTerrainID), .spawnArea(terrainSpawnArea),
+    .pixelPos, .pixelValid(junglePixelValid), .pixelColor(junglePixelColor)
 );
 
 parameter numWalls = 4;
@@ -389,9 +424,9 @@ generate
     genvar i;
     for (i = 0; i < numWalls; i = i + 1) begin : wallGeneration
         WallTerrain #(wallTerrainID[i]) wallTerrain (
-            .frameClk, .reset_h,
-            .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(wallTerrainID[i]),
-            .spawnArea(wallSpawn[i]), .pixelPos,
+            .clk(CLOCK_50), .reset_h,
+            .sigSpawn(terrainSigSpawn), .sigKill(terrainSigKill), .terrainID(swTerrainID),
+            .spawnArea(terrainSpawnArea), .pixelPos,
             .pixelValid(wallPixelValid[i]), .pixelColor(wallPixelColor[i]),
             .wallExists(wallExists[i]), .wallArea(wallArea[i])
         );
@@ -399,9 +434,9 @@ generate
 
     for (i = 0; i < numWater; i = i + 1) begin : waterGeneration
         WaterTerrain #(waterTerrainID[i]) waterTerrain (
-            .frameClk, .reset_h,
-            .sigSpawn(~KEY[1]), .sigKill(~KEY[2]), .terrainID(waterTerrainID[i]),
-            .spawnArea(waterSpawn[i]), .pixelPos, .waterArea(waterArea[i]),
+            .clk(CLOCK_50), .reset_h,
+            .sigSpawn(terrainSigSpawn), .sigKill(terrainSigKill), .terrainID(swTerrainID),
+            .spawnArea(terrainSpawnArea), .pixelPos, .waterArea(waterArea[i]),
             .waterExists(waterExists[i]), .pixelValid(waterPixelValid[i]),
             .pixelColor(waterPixelColor[i])
         );

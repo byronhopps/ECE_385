@@ -192,7 +192,7 @@ always_comb begin
         DEAD: bounceCountNext = '0;
         SPAWNED: bounceCountNext = '0;
         MOVING: bounceCountNext = bounceCount;
-        BOUNCE: bounceCountNext = bounceCount + 1;
+        BOUNCE: bounceCountNext = bounceCount + 1'b1;
     endcase
 end
 

@@ -286,6 +286,38 @@
          type = "String";
       }
    }
+   element tank_0_spawn_pos
+   {
+      datum _sortIndex
+      {
+         value = "22";
+         type = "int";
+      }
+   }
+   element tank_0_spawn_pos.s1
+   {
+      datum baseAddress
+      {
+         value = "320";
+         type = "String";
+      }
+   }
+   element tank_1_spawn_pos
+   {
+      datum _sortIndex
+      {
+         value = "23";
+         type = "int";
+      }
+   }
+   element tank_1_spawn_pos.s1
+   {
+      datum baseAddress
+      {
+         value = "336";
+         type = "String";
+      }
+   }
    element tank_control
    {
       datum _sortIndex
@@ -334,7 +366,7 @@
          type = "String";
       }
    }
-   element terrain_spawn
+   element terrain_spawn_pos
    {
       datum _sortIndex
       {
@@ -342,11 +374,27 @@
          type = "int";
       }
    }
-   element terrain_spawn.s1
+   element terrain_spawn_pos.s1
    {
       datum baseAddress
       {
          value = "256";
+         type = "String";
+      }
+   }
+   element terrain_spawn_radius
+   {
+      datum _sortIndex
+      {
+         value = "21";
+         type = "int";
+      }
+   }
+   element terrain_spawn_radius.s1
+   {
+      datum baseAddress
+      {
+         value = "304";
          type = "String";
       }
    }
@@ -426,6 +474,16 @@
    type="conduit"
    dir="end" />
  <interface
+   name="tank_0_spawn_pos"
+   internal="tank_0_spawn_pos.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="tank_1_spawn_pos"
+   internal="tank_1_spawn_pos.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
    name="tank_control"
    internal="tank_control.external_connection"
    type="conduit"
@@ -441,8 +499,13 @@
    type="conduit"
    dir="end" />
  <interface
-   name="terrain_spawn"
-   internal="terrain_spawn.external_connection"
+   name="terrain_spawn_pos"
+   internal="terrain_spawn_pos.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="terrain_spawn_radius"
+   internal="terrain_spawn_radius.external_connection"
    type="conduit"
    dir="end" />
  <module name="BUTTON_IN" kind="altera_avalon_pio" version="15.0" enabled="1">
@@ -572,7 +635,7 @@
   <parameter name="dataAddrWidth" value="29" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='sdram_pll.pll_slave' start='0x30' end='0x40' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x40' end='0x48' /><slave name='sysid_qsys_0.control_slave' start='0x48' end='0x50' /><slave name='LED.s1' start='0x50' end='0x60' /><slave name='SWITCH_IN.s1' start='0x60' end='0x70' /><slave name='BUTTON_IN.s1' start='0x70' end='0x80' /><slave name='tank_control.s1' start='0x80' end='0x90' /><slave name='otg_hpi_cs.s1' start='0x90' end='0xA0' /><slave name='otg_hpi_address.s1' start='0xA0' end='0xB0' /><slave name='otg_hpi_data.s1' start='0xB0' end='0xC0' /><slave name='otg_hpi_r.s1' start='0xC0' end='0xD0' /><slave name='otg_hpi_w.s1' start='0xD0' end='0xE0' /><slave name='game_control.s1' start='0xE0' end='0xF0' /><slave name='game_status.s1' start='0xF0' end='0x100' /><slave name='terrain_spawn.s1' start='0x100' end='0x110' /><slave name='terrain_id.s1' start='0x110' end='0x120' /><slave name='terrain_signal.s1' start='0x120' end='0x130' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='sdram_pll.pll_slave' start='0x30' end='0x40' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x40' end='0x48' /><slave name='sysid_qsys_0.control_slave' start='0x48' end='0x50' /><slave name='LED.s1' start='0x50' end='0x60' /><slave name='SWITCH_IN.s1' start='0x60' end='0x70' /><slave name='BUTTON_IN.s1' start='0x70' end='0x80' /><slave name='tank_control.s1' start='0x80' end='0x90' /><slave name='otg_hpi_cs.s1' start='0x90' end='0xA0' /><slave name='otg_hpi_address.s1' start='0xA0' end='0xB0' /><slave name='otg_hpi_data.s1' start='0xB0' end='0xC0' /><slave name='otg_hpi_r.s1' start='0xC0' end='0xD0' /><slave name='otg_hpi_w.s1' start='0xD0' end='0xE0' /><slave name='game_control.s1' start='0xE0' end='0xF0' /><slave name='game_status.s1' start='0xF0' end='0x100' /><slave name='terrain_spawn_pos.s1' start='0x100' end='0x110' /><slave name='terrain_id.s1' start='0x110' end='0x120' /><slave name='terrain_signal.s1' start='0x120' end='0x130' /><slave name='terrain_spawn_radius.s1' start='0x130' end='0x140' /><slave name='tank_0_spawn_pos.s1' start='0x140' end='0x150' /><slave name='tank_1_spawn_pos.s1' start='0x150' end='0x160' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -1040,6 +1103,42 @@
   <parameter name="id" value="-87367986" />
  </module>
  <module
+   name="tank_0_spawn_pos"
+   kind="altera_avalon_pio"
+   version="15.0"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="tank_1_spawn_pos"
+   kind="altera_avalon_pio"
+   version="15.0"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
    name="tank_control"
    kind="altera_avalon_pio"
    version="15.0"
@@ -1090,7 +1189,25 @@
   <parameter name="width" value="2" />
  </module>
  <module
-   name="terrain_spawn"
+   name="terrain_spawn_pos"
+   kind="altera_avalon_pio"
+   version="15.0"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="terrain_spawn_radius"
    kind="altera_avalon_pio"
    version="15.0"
    enabled="1">
@@ -1264,7 +1381,7 @@
    kind="avalon"
    version="15.0"
    start="nios2_gen2_0.data_master"
-   end="terrain_spawn.s1">
+   end="terrain_spawn_pos.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0100" />
   <parameter name="defaultConnection" value="false" />
@@ -1285,6 +1402,33 @@
    end="terrain_signal.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0120" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="15.0"
+   start="nios2_gen2_0.data_master"
+   end="terrain_spawn_radius.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0130" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="15.0"
+   start="nios2_gen2_0.data_master"
+   end="tank_0_spawn_pos.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0140" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="15.0"
+   start="nios2_gen2_0.data_master"
+   end="tank_1_spawn_pos.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0150" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1351,13 +1495,32 @@
  <connection kind="clock" version="15.0" start="clk_0.clk" end="otg_hpi_w.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="game_control.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="game_status.clk" />
- <connection kind="clock" version="15.0" start="clk_0.clk" end="terrain_spawn.clk" />
+ <connection
+   kind="clock"
+   version="15.0"
+   start="clk_0.clk"
+   end="terrain_spawn_pos.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="terrain_id.clk" />
  <connection
    kind="clock"
    version="15.0"
    start="clk_0.clk"
    end="terrain_signal.clk" />
+ <connection
+   kind="clock"
+   version="15.0"
+   start="clk_0.clk"
+   end="terrain_spawn_radius.clk" />
+ <connection
+   kind="clock"
+   version="15.0"
+   start="clk_0.clk"
+   end="tank_0_spawn_pos.clk" />
+ <connection
+   kind="clock"
+   version="15.0"
+   start="clk_0.clk"
+   end="tank_1_spawn_pos.clk" />
  <connection
    kind="clock"
    version="15.0"
@@ -1451,7 +1614,7 @@
    kind="reset"
    version="15.0"
    start="clk_0.clk_reset"
-   end="terrain_spawn.reset" />
+   end="terrain_spawn_pos.reset" />
  <connection
    kind="reset"
    version="15.0"
@@ -1462,6 +1625,21 @@
    version="15.0"
    start="clk_0.clk_reset"
    end="terrain_signal.reset" />
+ <connection
+   kind="reset"
+   version="15.0"
+   start="clk_0.clk_reset"
+   end="terrain_spawn_radius.reset" />
+ <connection
+   kind="reset"
+   version="15.0"
+   start="clk_0.clk_reset"
+   end="tank_0_spawn_pos.reset" />
+ <connection
+   kind="reset"
+   version="15.0"
+   start="clk_0.clk_reset"
+   end="tank_1_spawn_pos.reset" />
  <connection
    kind="reset"
    version="15.0"
