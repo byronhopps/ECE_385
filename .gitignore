@@ -22,6 +22,11 @@
 *.elf
 *.exe
 
+# Compilation Results
+*.map
+*.obj
+*.objdump
+
 # Ignore compilation and simulation directories
 incremental_db/
 output_files/

@@ -24,6 +24,7 @@
 #include "usb.h"
 #include "lcp_cmd.h"
 #include "lcp_data.h"
+#include "tankGame.h"
 
 
 //----------------------------------------------------------------------------------------//
@@ -49,7 +50,7 @@ int main(void)
 	static alt_u16 ctl_reg = 0;
 	static alt_u16 no_device = 0;
 	alt_u16 fs_device = 0;
-	int keycode = 0;
+	int keycode[6] = {0};
 	alt_u8 toggle = 0;
 	alt_u8 data_size;
 	alt_u8 hot_plug_count;
@@ -515,13 +516,23 @@ int main(void)
 
 		usb_ctl_val = UsbWaitTDListDone();
 
-		// packet starts from 0x051c, reading third byte
-		// TASK: Write the address to read from the memory for byte 3 of the report descriptor to HPI_ADDR.
+		// packet starts from 0x051c
+                // Second byte of packet is at 0x051d, and contains modifier bits
+                // Third, forth, and fifth bytes contain the six keycode values
 		IO_write(HPI_ADDR,0x051e); //the start address
-		keycode = IO_read(HPI_DATA);
-		printf("\nfirst two keycode values are %04x\n",keycode);
-		IOWR(KEYCODE_BASE, 0, keycode & 0xff);
+		keycode[0] = IO_read(HPI_DATA);
+		keycode[1] = (keycode[0] & 0xFF00) >> 8;
+                keycode[0] &= 0x00FF;
 
+                keycode[2] = IO_read(HPI_DATA);
+		keycode[3] = (keycode[2] & 0xFF00) >> 8;
+                keycode[2] &= 0x00FF;
+
+                keycode[4] = IO_read(HPI_DATA);
+		keycode[5] = (keycode[4] & 0xFF00) >> 8;
+                keycode[4] &= 0x00FF;
+
+                setTankControls(keycode);
 
 		usleep(200);//usleep(5000);
 		usb_ctl_val = UsbRead(ctl_reg);
