@@ -252,7 +252,7 @@ int matchKeycode (int keycode[6], int value)
     return 0;
 }
 
-#define NUM_LEVELS 3
+#define NUM_LEVELS 4
 #define NUM_JUNGLE 10
 #define NUM_WALLS  20
 #define NUM_WATER  10
@@ -264,14 +264,21 @@ void loadLevel(int level) {
 
     const struct point tankSpawnPos[NUM_LEVELS][NUM_TANKS] = {
         { { 50, 50}, {590,430} },   // Level 0
-        { { 50,430}, {590, 50} },   // Level 1
-        { {100,100}, {350,350} }    // Level 2
+        { {100,256}, {500,256} },   // Level 1
+        { { 50,430}, {590, 50} },   // Level 2
+        { {100,100}, {350,350} }    // Level 3
     };
 
     const struct area jungleSpawnArea[NUM_LEVELS][NUM_JUNGLE] = {
         { {{300,200}, { 50, 70}} }, // Level 0
 
-        { {{104,100}, { 32, 32}},   // Level 1
+        { {{320, 48}, {256, 48}},   // Level 1
+          {{320,448}, {256, 32}},
+          {{ 32,240}, { 32,240}},
+          {{608,240}, { 32,240}},
+          {{352,256}, { 64, 96}} },
+
+        { {{104,100}, { 32, 32}},   // Level 2
           {{104,356}, { 32, 32}},
           {{168,228}, { 31,160}},
           {{272,228}, { 23,160}},
@@ -280,7 +287,7 @@ void loadLevel(int level) {
           {{535,100}, { 48, 32}},
           {{505,356}, { 48, 32}},
           {{568,292}, { 15, 96}},
-          {{328,228}, { 32, 32}} }  // End level 1
+          {{328,228}, { 32, 32}} }
     };
 
     const struct area wallSpawnArea[NUM_LEVELS][NUM_WALLS] = {
@@ -289,7 +296,16 @@ void loadLevel(int level) {
           {{496,320}, {  8, 20}},
           {{144,320}, {  8, 20}} },
 
-        { {{104,228}, { 32, 32}},   // Level 1
+        { {{224,128}, {  8, 12}},   // Level 1
+          {{416,128}, {  8, 12}},
+          {{576,128}, {  8, 12}},
+          {{224,256}, {  8, 12}},
+          {{576,256}, {  8, 12}},
+          {{224,384}, {  8, 12}},
+          {{416,384}, {  8, 12}},
+          {{576,384}, {  8, 12}} },
+
+        { {{104,228}, { 32, 32}},   // Level 2
           {{328, 92}, { 32, 24}},
           {{328,364}, { 32, 24}},
           {{520,228}, { 32, 32}} }
@@ -299,7 +315,12 @@ void loadLevel(int level) {
         { {{520,180}, { 30, 20}},   // Level 0
           {{320,320}, { 40, 25}} },
 
-        { {{104,164}, { 32, 32}},   // Level 1
+        { {{176,192}, { 48, 32}},   // Level 1
+          {{176,320}, { 48, 32}},
+          {{528,192}, { 48, 32}},
+          {{528,320}, { 48, 32}} },
+
+        { {{104,164}, { 32, 32}},   // Level 2
           {{104,292}, { 32, 32}},
           {{328,156}, { 32, 40}},
           {{328,300}, { 32, 40}},
@@ -307,9 +328,9 @@ void loadLevel(int level) {
           {{505,292}, { 48, 32}} }
     };
 
-    const int jungleTilesUsed[NUM_LEVELS] = {1,10,0};
-    const int waterTilesUsed[NUM_LEVELS]  = {2,6,0};
-    const int wallTilesUsed[NUM_LEVELS]   = {4,4,0};
+    const int jungleTilesUsed[NUM_LEVELS] = {1,5,10,0};
+    const int waterTilesUsed[NUM_LEVELS]  = {2,4,6,0};
+    const int wallTilesUsed[NUM_LEVELS]   = {4,8,4,0};
 
     // Sanity check to enforce hardware limitations
     assert(jungleTilesUsed[level] <= NUM_JUNGLE);
