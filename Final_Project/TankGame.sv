@@ -15,6 +15,12 @@ module TankGame (
                         VGA_VS,       //VGA virtical sync signal
                         VGA_HS,       //VGA horizontal sync signal
 
+    // Hex displays
+    output logic [6:0]  HEX4,         //Hex display 4
+                        HEX5,         //Hex display 5
+                        HEX6,         //Hex display 6
+                        HEX7,         //Hex display 7
+
     // CY7C67200 Interface
     inout  wire  [15:0] OTG_DATA,     //CY7C67200 Data bus 16 Bits
     output logic [1:0]  OTG_ADDR,     //CY7C67200 Address 2 Bits
@@ -83,14 +89,17 @@ TankGame_soc soc (
 
 // SW-HW game interface signals
 logic [15:0] swGameControl;
+logic [1:0]  tankScoreCount [2];
 logic terrainSigSpawn, terrainSigKill, tankSigSpawn, tankSigKill;
 logic bulletSigKill, sigPause;
-assign tankSigSpawn    = swGameControl[0];
-assign tankSigKill     = swGameControl[1];
-assign bulletSigKill   = swGameControl[1];
-assign terrainSigSpawn = swGameControl[2];
-assign terrainSigKill  = swGameControl[3];
-assign sigPause        = swGameControl[8];
+assign tankSigSpawn      = swGameControl[0];
+assign tankSigKill       = swGameControl[1];
+assign bulletSigKill     = swGameControl[1];
+assign terrainSigSpawn   = swGameControl[2];
+assign terrainSigKill    = swGameControl[3];
+assign sigPause          = swGameControl[8];
+assign tankScoreCount[0] = swGameControl[5:4];
+assign tankScoreCount[1] = swGameControl[7:6];
 
 
 logic [31:0] swTank0SpawnPos, swTank1SpawnPos;
@@ -133,6 +142,26 @@ hpi_io_intf hpi_io_inst(
     .OTG_CS_N,
     .OTG_RST_N
 );
+
+// Score counters
+logic [7:0] tankScore[2];
+logic scoreReset;
+assign scoreReset = reset_h | ~KEY[3];
+
+generate
+    for (i = 0; i < 2; i = i + 1) begin : scoreDisplayGeneration
+        ScoreCounter (
+            .clk(CLOCK_50), .reset_h(scoreReset),
+            .up(tankScoreCount[i][0]), .down(tankScoreCount[i][1]),
+            .count(tankScore[i])
+        );
+    end
+endgenerate
+
+HexDriver (.IN(tankScore[1][3:0]), .OUT(HEX4));
+HexDriver (.IN(tankScore[1][7:4]), .OUT(HEX5));
+HexDriver (.IN(tankScore[0][3:0]), .OUT(HEX6));
+HexDriver (.IN(tankScore[0][7:4]), .OUT(HEX7));
 
 // Signal for current pixel being drawn
 POSITION pixelPos;
@@ -376,49 +405,29 @@ generate
     end
 endgenerate
 
-logic junglePixelValid;
-COLOR junglePixelColor;
-RECT  jungleSpawn;
-assign jungleSpawn = '{center:'{300,200}, radius:'{50,70}};
-JungleTerrain #(1) jungle (
-    .clk(CLOCK_50), .reset_h,
-    .sigSpawn(terrainSigSpawn), .sigKill(terrainSigKill),
-    .terrainID(swTerrainID), .spawnArea(terrainSpawnArea),
-    .pixelPos, .pixelValid(junglePixelValid), .pixelColor(junglePixelColor)
-);
 
-parameter numWalls = 4;
-parameter numWater = 2;
+parameter numWalls  = 20;
+parameter numWater  = 10;
+parameter numJungle = 10;
 
-logic wallPixelValid  [numWalls];
-logic waterPixelValid [numWater];
+logic wallPixelValid   [numWalls];
+logic waterPixelValid  [numWater];
+logic junglePixelValid [numJungle];
 
-COLOR wallPixelColor  [numWalls];
-COLOR waterPixelColor [numWater];
+COLOR wallPixelColor   [numWalls];
+COLOR waterPixelColor  [numWater];
+COLOR junglePixelColor [numJungle];
 
 logic wallExists  [numWalls];
 logic waterExists [numWater];
 
-RECT wallSpawn  [numWalls];
-RECT waterSpawn [numWater];
-
 RECT wallArea  [numWalls];
 RECT waterArea [numWater];
 
-parameter logic [7:0] wallTerrainID  [numWalls] = '{10,11,12,13};
-parameter logic [7:0] waterTerrainID [numWater] = '{20,21};
-
-assign wallSpawn = '{
-    '{center:'{144,104}, radius:'{8,20}},
-    '{center:'{336,224}, radius:'{8,20}},
-    '{center:'{496,320}, radius:'{8,20}},
-    '{center:'{144,320}, radius:'{8,20}}
-};
-
-assign waterSpawn = '{
-    '{center:'{520,180}, radius:'{30,20}},
-    '{center:'{320,320}, radius:'{40,25}}
-};
+parameter logic [7:0] jungleTerrainID [numJungle] = '{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+parameter logic [7:0] waterTerrainID  [numWater]  = '{10,11,12,13,14,15,16,17,18,19};
+parameter logic [7:0] wallTerrainID   [numWalls]  = '{20,21,22,23,24,25,26,27,28,29,
+                                                      30,31,32,33,34,35,36,37,38,39};
 
 generate
     genvar i;
@@ -442,6 +451,15 @@ generate
         );
     end
 
+    for (i = 0; i < numJungle; i = i + 1) begin : jungleGeneration
+        JungleTerrain #(jungleTerrainID[i]) jungle (
+            .clk(CLOCK_50), .reset_h,
+            .sigSpawn(terrainSigSpawn), .sigKill(terrainSigKill),
+            .terrainID(swTerrainID), .spawnArea(terrainSpawnArea),
+            .pixelPos, .pixelValid(junglePixelValid[i]), .pixelColor(junglePixelColor[i])
+        );
+    end
+
     logic tankWallCollide [numTanks];
     logic bulletHitWall   [numTanks];
     logic tankHitWater    [numTanks];
@@ -449,7 +467,7 @@ generate
     for (i = 0; i < numTanks; i = i + 1) begin : tankWallCollisionGeneration
         ObstacleCollisionDetect #(numWalls) tankOnWall (
             .sysClk(CLOCK_50), .frameClk, .reset_h,
-            .entityArea(nextTankEntity[i]), .obstacleArea(wallSpawn),
+            .entityArea(nextTankEntity[i]), .obstacleArea(wallArea),
             .obstacleExists(wallExists),
             .sigCollide(tankWallCollide[i]), .done()
         );
@@ -463,7 +481,7 @@ generate
 
         ObstacleCollisionDetect #(numWalls) bulletOnWall (
             .sysClk(CLOCK_50), .frameClk, .reset_h,
-            .entityArea(bulletArea[i]), .obstacleArea(wallSpawn),
+            .entityArea(bulletArea[i]), .obstacleArea(wallArea),
             .obstacleExists(wallExists), .sigCollide(bulletHitWall[i]), .done()
         );
     end
@@ -478,17 +496,92 @@ always_comb begin
         {VGA_R, VGA_G, VGA_B} = wallPixelColor[2];
     end else if (wallPixelValid[3]) begin
         {VGA_R, VGA_G, VGA_B} = wallPixelColor[3];
-    end else if (junglePixelValid) begin
-        {VGA_R, VGA_G, VGA_B} = junglePixelColor;
-    end else if (bulletPixelColor[0] != BACKGROUND && bulletExists[0]) begin
+    end else if (wallPixelValid[4]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[4];
+    end else if (wallPixelValid[5]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[5];
+    end else if (wallPixelValid[6]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[6];
+    end else if (wallPixelValid[7]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[7];
+    end else if (wallPixelValid[8]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[8];
+    end else if (wallPixelValid[9]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[9];
+    end else if (wallPixelValid[10]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[10];
+    end else if (wallPixelValid[11]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[11];
+    end else if (wallPixelValid[12]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[12];
+    end else if (wallPixelValid[13]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[13];
+    end else if (wallPixelValid[14]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[14];
+    end else if (wallPixelValid[15]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[15];
+    end else if (wallPixelValid[16]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[16];
+    end else if (wallPixelValid[17]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[17];
+    end else if (wallPixelValid[18]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[18];
+    end else if (wallPixelValid[19]) begin
+        {VGA_R, VGA_G, VGA_B} = wallPixelColor[19];
+    end
+
+    else if (junglePixelValid[0]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[0];
+    end else if (junglePixelValid[1]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[1];
+    end else if (junglePixelValid[2]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[2];
+    end else if (junglePixelValid[3]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[3];
+    end else if (junglePixelValid[4]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[4];
+    end else if (junglePixelValid[5]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[5];
+    end else if (junglePixelValid[6]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[6];
+    end else if (junglePixelValid[7]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[7];
+    end else if (junglePixelValid[8]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[8];
+    end else if (junglePixelValid[9]) begin
+        {VGA_R, VGA_G, VGA_B} = junglePixelColor[9];
+    end
+
+    else if (bulletPixelColor[0] != BACKGROUND && bulletExists[0]) begin
         {VGA_R, VGA_G, VGA_B} = bulletPixelColor[0];
     end else if (bulletPixelColor[1] != BACKGROUND && bulletExists[1]) begin
         {VGA_R, VGA_G, VGA_B} = bulletPixelColor[1];
-    end else if (waterPixelValid[0]) begin
+
+    end
+
+    else if (waterPixelValid[0]) begin
         {VGA_R, VGA_G, VGA_B} = waterPixelColor[0];
     end else if (waterPixelValid[1]) begin
         {VGA_R, VGA_G, VGA_B} = waterPixelColor[1];
-    end else if (tankPixelColor[0] != BACKGROUND && tankExists[0]) begin
+    end else if (waterPixelValid[2]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[2];
+    end else if (waterPixelValid[3]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[3];
+    end else if (waterPixelValid[4]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[4];
+    end else if (waterPixelValid[5]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[5];
+    end else if (waterPixelValid[6]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[6];
+    end else if (waterPixelValid[7]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[7];
+    end else if (waterPixelValid[8]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[8];
+    end else if (waterPixelValid[9]) begin
+        {VGA_R, VGA_G, VGA_B} = waterPixelColor[9];
+    end
+
+    else if (tankPixelColor[0] != BACKGROUND && tankExists[0]) begin
         {VGA_R, VGA_G, VGA_B} = tankPixelColor[0];
     end else if (tankPixelColor[1] != BACKGROUND && tankExists[1]) begin
         {VGA_R, VGA_G, VGA_B} = tankPixelColor[1];

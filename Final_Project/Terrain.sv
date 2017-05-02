@@ -148,7 +148,6 @@ endmodule
 module EntityCore (
     input  logic clk, reset_h,
     input  logic sigSpawn, sigKill,
-    input  logic sigLoad,
     input  logic [7:0] terrainID,
     input  RECT  spawnArea,
     output RECT  curArea,
