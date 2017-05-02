@@ -252,10 +252,10 @@ int matchKeycode (int keycode[6], int value)
     return 0;
 }
 
-#define NUM_LEVELS 1
-#define NUM_JUNGLE 1
-#define NUM_WALLS  4
-#define NUM_WATER  2
+#define NUM_LEVELS 3
+#define NUM_JUNGLE 10
+#define NUM_WALLS  20
+#define NUM_WATER  10
 #define NUM_TANKS  2
 
 void loadLevel(int level) {
@@ -263,37 +263,63 @@ void loadLevel(int level) {
     level %= NUM_LEVELS;
 
     const struct point tankSpawnPos[NUM_LEVELS][NUM_TANKS] = {
-        { {50,50}, {590,430} }  // Level 0
+        { { 50, 50}, {590,430} },   // Level 0
+        { { 50,430}, {590, 50} },   // Level 1
+        { {100,100}, {350,350} }    // Level 2
     };
 
     const struct area jungleSpawnArea[NUM_LEVELS][NUM_JUNGLE] = {
-        { {{300, 200}, {50,70}} } // Level 0
+        { {{300,200}, { 50, 70}} }, // Level 0
+
+        { {{104,100}, { 32, 32}},   // Level 1
+          {{104,356}, { 32, 32}},
+          {{168,228}, { 31,160}},
+          {{272,228}, { 23,160}},
+          {{384,228}, { 23,160}},
+          {{472,164}, { 15, 96}},
+          {{535,100}, { 48, 32}},
+          {{505,356}, { 48, 32}},
+          {{568,292}, { 15, 96}},
+          {{328,228}, { 32, 32}} }  // End level 1
     };
 
     const struct area wallSpawnArea[NUM_LEVELS][NUM_WALLS] = {
-        {   {{144,104}, {8,20}},
-            {{336,224}, {8,20}},
-            {{496,320}, {8,20}},
-            {{144,320}, {8,20}}   }
+        { {{144,104}, {  8, 20}},   // Level 0
+          {{336,224}, {  8, 20}},
+          {{496,320}, {  8, 20}},
+          {{144,320}, {  8, 20}} },
+
+        { {{104,228}, { 32, 32}},   // Level 1
+          {{328, 92}, { 32, 24}},
+          {{328,364}, { 32, 24}},
+          {{520,228}, { 32, 32}} }
     };
 
     const struct area waterSpawnArea[NUM_LEVELS][NUM_WATER] = {
-        {   {{520,180}, {30,20}},
-            {{320,320}, {40,25}}   }
+        { {{520,180}, { 30, 20}},   // Level 0
+          {{320,320}, { 40, 25}} },
+
+        { {{104,164}, { 32, 32}},   // Level 1
+          {{104,292}, { 32, 32}},
+          {{328,156}, { 32, 40}},
+          {{328,300}, { 32, 40}},
+          {{535,164}, { 48, 32}},
+          {{505,292}, { 48, 32}} }
     };
 
-    const int jungleTilesUsed[NUM_LEVELS] = {1};
-    const int waterTilesUsed[NUM_LEVELS] = {2};
-    const int wallTilesUsed[NUM_LEVELS] = {4};
+    const int jungleTilesUsed[NUM_LEVELS] = {1,10,0};
+    const int waterTilesUsed[NUM_LEVELS]  = {2,6,0};
+    const int wallTilesUsed[NUM_LEVELS]   = {4,4,0};
 
     // Sanity check to enforce hardware limitations
     assert(jungleTilesUsed[level] <= NUM_JUNGLE);
     assert(waterTilesUsed[level] <= NUM_WATER);
     assert(wallTilesUsed[level] <= NUM_WALLS);
 
-    const int jungleTerrainID[NUM_JUNGLE] = {1};
-    const int waterTerrainID[NUM_WATER] = {20,21};
-    const int wallTerrainID[NUM_WALLS] = {10,11,12,13};
+    const int jungleTerrainID[NUM_JUNGLE] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    const int waterTerrainID[NUM_WATER]   = {10,11,12,13,14,15,16,17,18,19};
+    const int wallTerrainID[NUM_WALLS]    = {20,21,22,23,24,25,26,27,28,29,
+                                             30,31,32,33,34,35,36,37,38,39};
 
     // Despawn all entities and terrain
     *GameControlReg |=  0x000A;
@@ -339,7 +365,7 @@ void loadTerrain(struct area spawnArea, int terrainID)
     *GameControlReg &= ~0x0004;
 
     // Change terrain ID to an invalid number
-    *TerrainIDreg = 0x00;
+    *TerrainIDreg = 0xFF;
 
     return;
 }

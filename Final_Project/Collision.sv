@@ -94,7 +94,8 @@ module ObstacleCollisionDetect (
 
 parameter n = -1;
 
-assign sigCollide = done & results.or();
+assign sigCollide = ~done | results.or();
+/* assign sigCollide = done & results.or(); */
 
 logic collision;
 DetectCollision collisionDetector (.A(entityArea), .B(obstacleArea[idx]), .collision);
